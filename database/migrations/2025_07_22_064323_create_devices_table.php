@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('devices', function (Blueprint $table) {
             $table->id();
-            $table->enum('device_type', ['mobile', 'tablet', 'pc/mac', 'gadget', 'wearable', 'other'])->default('phone');
+            $table->enum('device_type', ['mobile', 'tablet', 'pc/mac', 'gadget', 'wearable', 'other'])->default('mobile');
             $table->string('brand');
             $table->string('model');
             $table->string('imei')->nullable();
