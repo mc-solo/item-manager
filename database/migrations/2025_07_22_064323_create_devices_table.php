@@ -23,6 +23,7 @@ return new class extends Migration {
 
             $table->text('issue_description')->nullable();
             $table->enum('repair_status', ['pending', 'in_progress', 'completed', 'cancelled', 'delivered'])->default('pending');
+            $table->timestamps();
 
         });
     }
