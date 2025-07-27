@@ -12,27 +12,18 @@ return new class extends Migration {
     {
         Schema::create('devices', function (Blueprint $table) {
             $table->id();
-            $table->enum('device_type', ['mobile', 'tablet', 'pc/mac', 'gadget', 'wearable', 'other'])->default('mobile');
-            $table->string('brand');
-            $table->string('model');
-            $table->string('imei')->nullable();
+            $table->string('order_number')->unique();
+            $table->string('client_name');
+            $table->string('client_number');
+
+            $table->enum('device_type', ['mobile', 'laptop', 'tablet', 'pc', 'mac', 'other'])->default('mobile');
+            $table->string('device_model');
             $table->string('serial_number')->nullable();
-            $table->text('description')->nullable();
+            $table->string('imei')->nullable();
 
-            // status info
-            $table->enum('repair_status', ['received', 'in_progress', 'ready', 'delivered'])->default('received');
+            $table->text('issue_description')->nullable();
+            $table->enum('repair_status', ['pending', 'in_progress', 'completed', 'cancelled', 'delivered'])->default('pending');
 
-            // owner info
-            $table->string('owner_name');
-            $table->string('owner_number');
-
-            // payment info
-            $table->enum('payment_method', ['cash', 'transfer']);
-            $table->enum('payment_status', ['paid', 'unpaid'])->default('unpaid');
-            $table->decimal('price', 6, 2)->default(0.00);
-
-            $table->timestamp('received_at')->useCurrent();
-            $table->timestamp('expected_delivery_at')->nullable();
         });
     }
 
