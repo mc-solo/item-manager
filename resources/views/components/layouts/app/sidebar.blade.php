@@ -20,7 +20,7 @@
                 </flux:navlist.item>
                 </flux:navlist.item>
                 <flux:navlist.group :heading="__('Phone')" class="grid">
-                    <flux:navlist.item icon="device-phone-mobile" :href="route('dashboard')"
+                    <flux:navlist.item icon="device-phone-mobile" :href="route('devices')"
                         :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Devices') }}</flux:navlist.item>
                 </flux:navlist.group>
                 <flux:navlist.group :heading="__('Boss')" class="grid">
