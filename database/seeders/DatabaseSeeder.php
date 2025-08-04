@@ -20,5 +20,8 @@ class DatabaseSeeder extends Seeder
             'email' => 'boss@shop.com',
             'password' => 'password'
         ]);
+        $this->call([
+            DeviceSeeder::class,
+        ]);
     }
 }
