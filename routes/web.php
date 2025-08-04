@@ -4,7 +4,6 @@ use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\V1\DeviceController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -25,3 +24,4 @@ Route::middleware(['auth'])->group(function () {
 });
 
 require __DIR__ . '/auth.php';
+require __DIR__ . '/device.php';
