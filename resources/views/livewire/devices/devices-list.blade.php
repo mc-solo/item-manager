@@ -8,9 +8,9 @@
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Order #</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Client</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Device | Model</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Issue</th>
+                    <!-- <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Issue</th> -->
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Status</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Received At</th>
+                    <!-- <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Received At</th> -->
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Actions</th>
                 </tr>
             </thead>
@@ -23,7 +23,7 @@
                         <td class="px-4 py-3 whitespace-nowrap">{{ ucfirst($device->device_type) }}
                             {{ $device->device_model }}
                         </td>
-                        <td class="px-4 py-3 whitespace-nowrap max-w-xs truncate">{{ $device->issue_description }}</td>
+                        <!-- <td class="px-4 py-3 whitespace-nowrap max-w-xs truncate">{{ $device->issue_description }}</td> -->
                         <td class="px-4 py-3 whitespace-nowrap">
                             @php
                                 $statusColors = [
@@ -38,9 +38,9 @@
                                 {{ ucfirst(str_replace('_', ' ', $device->repair_status)) }}
                             </span>
                         </td>
-                        <td class="px-4 py-3 whitespace-nowrap text-xs text-neutral-500">
-                            {{ $device->created_at->format('Y-m-d') }}
-                        </td>
+                        <!-- <td class="px-4 py-3 whitespace-nowrap text-xs text-neutral-500">
+                                {{ $device->created_at->format('Y-m-d') }}
+                            </td> -->
                         <td class="px-4 py-3 whitespace-nowrap">
                             @include('livewire.devices.device-actions', ['device' => $device])
                         </td>
