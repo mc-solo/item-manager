@@ -4,6 +4,7 @@ use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Device\DeviceController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -21,6 +22,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
 
     Route::view('devices', 'livewire.devices.index')->name('devices');
+    Route::get('devices/show/{device}', [DeviceController::class, 'show'])->name('devices.show');
 });
 
 require __DIR__ . '/auth.php';
