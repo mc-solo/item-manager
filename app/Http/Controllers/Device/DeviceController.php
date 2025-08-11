@@ -17,11 +17,6 @@ class DeviceController extends Controller
         return view('livewire.devices.index', compact('devices'));
     }
 
-    // return a view [form] for creating a new device
-    public function create()
-    {
-
-    }
 
     // stores a new device
     public function store(Request $request)
@@ -46,7 +41,7 @@ class DeviceController extends Controller
         $validatedData['order_number'] = $orderNumber;
 
         $device = Device::create($validatedData);
-        return redirect()->route('devices.show', $device);
+        return redirect()->route('device.show', $device);
     }
 
     // show a specific device with all its details
@@ -54,7 +49,7 @@ class DeviceController extends Controller
     {
         // load the progress logs for the device
         $device->load('progressLogs');
-
+        return view('livewire.devices.show', compact('device'));
     }
 
     public function edit(Device $device)
@@ -77,7 +72,7 @@ class DeviceController extends Controller
             'repair_status' => ['required', Rule::in(['pending', 'in_progress', 'completed', 'cancelled'])],
         ]);
         $device->update($validatedData);
-        return redirect()->route('devices.show', $device);
+        return redirect()->route('device.show', $device);
     }
 
     // delete a device from the database
