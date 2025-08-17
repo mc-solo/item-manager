@@ -17,8 +17,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('devices/store', [DeviceController::class, 'store'])->name('device.store');
     Route::put('devices/update/{device}', [DeviceController::class, 'update'])->name('device.update');
     Route::delete('devices/delete/{device}', [DeviceController::class, 'destroy'])->name('device.destroy');
-    Route::get('devices/create', function () {
-        return view('livewire.devices.device-create');
-    })->name('device.create');
+    Route::get('devices/create', [DeviceController::class, 'create'])->name('device.create');
 
 });

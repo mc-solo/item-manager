@@ -1,5 +1,5 @@
 @component('components.layouts.app')
-@section('title', __('Edit Device'))
+@section('title', __('Edit Order Details'))
 
 <div class="max-w-2xl mx-auto p-4">
     <h1 class="text-2xl font-bold mb-6 text-neutral-900 dark:text-neutral-100">Edit Device</h1>

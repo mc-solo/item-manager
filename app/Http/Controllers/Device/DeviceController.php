@@ -17,6 +17,11 @@ class DeviceController extends Controller
         return view('livewire.devices.index', compact('devices'));
     }
 
+    // show the create device form
+    public function create()
+    {
+        return view('livewire.devices.device-create');
+    }
 
     // stores a new device
     public function store(Request $request)
