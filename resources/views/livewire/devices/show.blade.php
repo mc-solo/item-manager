@@ -85,13 +85,13 @@
     </div>
     <div class="flex justify-end mt-6 gap-2">
         <a href="{{ route('device.edit', $device) }}"
-            class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 font-semibold transition">Edit</a>
+            class="px-4 py-2 bg-green-200 text-black hover:bg-green-300 rounded-lg shadow hover:bg-blue-700 font-semibold transition">Edit</a>
         <form method="POST" action="{{ route('device.destroy', $device) }}"
             onsubmit="return confirm('Are you sure you want to delete this device?');">
             @csrf
             @method('DELETE')
             <button type="submit"
-                class="px-4 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 font-semibold transition">Delete</button>
+                class="px-4 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 font-semibold transition cursor-pointer">Delete</button>
         </form>
     </div>
 </div>
