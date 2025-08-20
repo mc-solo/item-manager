@@ -17,6 +17,11 @@
                 :class="{ 'ring-2 ring-blue-200': viewMode === 'grid' }" @click="viewMode = 'grid'">Grid</button>
         </div>
     </div>
-    @include('livewire.devices.devices-list')
+    <div>
+        @include('livewire.devices.devices-list', ['viewMode' => null])
+        <div class="flex justify-center mt-4">
+            {{ $devices->links() }}
+        </div>
+    </div>
 </div>
 @endcomponent

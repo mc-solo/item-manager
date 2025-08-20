@@ -23,7 +23,6 @@
                         <td class="px-4 py-3 whitespace-nowrap">{{ ucfirst($device->device_type) }}
                             {{ $device->device_model }}
                         </td>
-                        <!-- <td class="px-4 py-3 whitespace-nowrap max-w-xs truncate">{{ $device->issue_description }}</td> -->
                         <td class="px-4 py-3 whitespace-nowrap">
                             @php
                                 $statusColors = [
@@ -38,9 +37,6 @@
                                 {{ ucfirst(str_replace('_', ' ', $device->repair_status)) }}
                             </span>
                         </td>
-                        <!-- <td class="px-4 py-3 whitespace-nowrap text-xs text-neutral-500">
-                                {{ $device->created_at->format('Y-m-d') }}
-                            </td> -->
                         <td class="px-4 py-3 whitespace-nowrap">
                             @include('livewire.devices.device-actions', ['device' => $device])
                         </td>
@@ -50,7 +46,6 @@
         </table>
     </div>
     <!-- Device Card Grid View -->
-    <!--todo: synchronize card and table views -->
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-4" x-show="viewMode === 'grid'">
         @foreach ($devices as $device)
             @include('livewire.devices.device-card', ['device' => $device])

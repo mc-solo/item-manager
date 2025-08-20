@@ -13,7 +13,7 @@ class DeviceController extends Controller
     public function index()
     {
         // fetch all device with their progress logs
-        $devices = Device::with('progressLogs')->get();
+        $devices = Device::with('progressLogs')->paginate(30); //30 devides per page shoud be good.
         return view('livewire.devices.index', compact('devices'));
     }
 
