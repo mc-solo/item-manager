@@ -3,33 +3,64 @@
 namespace App\Http\Controllers\Device;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreDeviceRequest;
+use App\Http\Requests\UpdateDeviceRequest;
 use App\Models\Device;
-use Illuminate\Validation\Rule;
+use Illuminate\Http\Request;
 
 class DeviceController extends Controller
 {
     // return a listing of devices for /device route
     public function index(Request $request)
     {
-        $query = $request->input('search');
-        $devices = Device::with('progressLogs')
-            ->when($query, function ($q) use ($query) {
-                $q->where('client_number', 'like', "%{$query}%")
-                  ->orWhere('client_name', 'like', "%{$query}%");
-            })
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $search = $request->input('search');
+        \Log::info('Search request received', [
+            'search' => $search,
+            'request_data' => $request->all(),
+            'url' => $request->fullUrl()
+        ]);
+        
+        $query = Device::with('progressLogs');
+            
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('client_number', 'like', "%{$search}%")
+                  ->orWhere('client_name', 'like', "%{$search}%")
+                  ->orWhere('order_number', 'like', "%{$search}%")
+                  ->orWhere('device_model', 'like', "%{$search}%");
+            });
+            
+            // Log the raw SQL query for debugging
+            \Log::info('Search query', [
+                'sql' => $query->toSql(),
+                'bindings' => $query->getBindings(),
+                'full_sql' => vsprintf(str_replace('?', "'%s'", $query->toSql()), $query->getBindings())
+            ]);
+        }
+        
+        $devices = $query->orderBy('created_at', 'desc')->get();
+        
+        \Log::info('Search results', [
+            'search_term' => $search,
+            'result_count' => $devices->count(),
+            'first_few_results' => $devices->take(3)->toArray()
+        ]);
+        
+        // Format the devices data
+        $formattedDevices = $devices->map(function($device) {
+            return array_merge($device->toArray(), [
+                'created_at' => $device->created_at->toDateTimeString(),
+                'updated_at' => $device->updated_at->toDateTimeString(),
+            ]);
+        })->toArray();
 
         if ($request->ajax() || $request->wantsJson()) {
-            return response()->json([
-                'devices' => $devices->toArray()
-            ]);
+            return response()->json($formattedDevices);
         }
 
         return view('livewire.devices.index', [
             'devices' => $devices,
-            'search' => $query
+            'search' => $search
         ]);
     }
 
@@ -40,28 +71,26 @@ class DeviceController extends Controller
     }
 
     // stores a new device
-    public function store(Request $request)
+    public function store(StoreDeviceRequest $request)
     {
-        // validate the request
-        $validatedData = $request->validate([
-            'client_name' => 'required|string|max:100',
-            'client_number' => 'required|string|max:15',
-            'device_type' => ['required', Rule::in(['mobile', 'laptop', 'tablet', 'pc', 'mac', 'other'])],
-            'device_model' => 'required|string|max:100',
-            'serial_number' => 'nullable|string|max:100',
-            'imei' => 'nullable|string|max:100',
-            'issue_description' => 'nullable|string|max:500',
-            'repair_status' => ['required', Rule::in(['pending', 'in_progress', 'completed', 'cancelled'])],
-        ]);
-
         // generate unique order_number: TPB-XXXXX (5 random digits) and TPB is short for The Phone Boss
-        // I'll later use this order_number to track the device progress and details
         do {
             $orderNumber = 'TPB-' . str_pad(random_int(0, 99999), 5, '0', STR_PAD_LEFT);
         } while (Device::where('order_number', $orderNumber)->exists());
-        $validatedData['order_number'] = $orderNumber;
-
-        $device = Device::create($validatedData);
+        
+        $validated = $request->validated();
+        $validated['order_number'] = $orderNumber;
+        
+        $device = Device::create($validated);
+        
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Device created successfully.',
+                'data' => $device
+            ]);
+        }
+        
         return redirect()->route('device.show', $device);
     }
 
@@ -80,19 +109,9 @@ class DeviceController extends Controller
     }
 
     // update the device details
-    public function update(Request $request, Device $device)
+    public function update(UpdateDeviceRequest $request, Device $device)
     {
-        $validatedData = $request->validate([
-            'client_name' => 'required|string|max:100',
-            'client_number' => 'required|string|max:15',
-            'device_type' => ['required', Rule::in(['mobile', 'laptop', 'tablet', 'pc', 'mac', 'other'])],
-            'device_model' => 'required|string|max:100',
-            'serial_number' => 'nullable|string|max:100',
-            'imei' => 'nullable|string|max:100',
-            'issue_description' => 'nullable|string|max:500',
-            'repair_status' => ['required', Rule::in(['pending', 'in_progress', 'completed', 'cancelled'])],
-        ]);
-        $device->update($validatedData);
+        $device->update($request->validated());
         return redirect()->route('device.show', $device);
     }
 
