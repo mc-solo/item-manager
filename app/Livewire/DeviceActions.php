@@ -12,6 +12,7 @@ class DeviceActions extends Component
     public $devices;
     public $device;
     public $view = 'index'; // index, show, edit, create
+    public $search = '';
 
     public $form = [
         'client_name' => '',
@@ -39,6 +40,15 @@ class DeviceActions extends Component
             $this->devices = Device::with('progressLogs')->get();
             $this->view = 'index';
         }
+        // search init
+        $this->search = '';
+    }
+
+    public function updatedSearch()
+    {
+        $this->devices = Device::with('progressLogs')
+            ->where('client_number', 'like', "%{$this->search}%")
+            ->get();
     }
 
     public function store()
