@@ -3,9 +3,11 @@
 
 <div x-data="{ viewMode: 'table' }" class="flex flex-col gap-6 h-full">
     <div class="flex items-center justify-between gap-2">
-        <h1 class="text-2xl font-bold">Devices</h1>
-        <div class="flex gap-2 items-center">
+        <div class="flex items-center gap-4">
+            <h1 class="text-2xl font-bold">Devices</h1>
             @include('livewire.devices.search-bar')
+        </div>
+        <div class="flex gap-2 items-center">
             <a href="{{ route('device.create') }}"
                 class="rounded-lg px-4 py-2 bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900 font-semibold shadow hover:bg-neutral-700 dark:hover:bg-neutral-200 transition">
                 Add Order</a>
