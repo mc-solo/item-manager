@@ -14,13 +14,20 @@ class DeviceController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
+        $status = $request->input('status');
+        $dateRange = $request->input('date_range');
+
         \Log::info('Search request received', [
             'search' => $search,
+            'status' => $status,
+            'date_range' => $dateRange,
             'request_data' => $request->all(),
             'url' => $request->fullUrl()
         ]);
         
-        $query = Device::with('progressLogs');
+        $query = Device::with('progressLogs')
+            ->status($status)
+            ->dateRange($dateRange);
             
         if ($search) {
             $query->where(function($q) use ($search) {
