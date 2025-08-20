@@ -33,7 +33,7 @@ class Device extends Model
     }
 
     /**
-     * Validate the client number format.
+     * Validate the client number format so that it's either from Safaricom or Ethio Telecom
      *
      * @param  string  $value
      * @return void
@@ -60,8 +60,50 @@ class Device extends Model
      */
     public function setClientNumberAttribute($value)
     {
-        // Remove any non-numeric characters
+        // remove any non-numeric characters, i hate to use a regex
         $number = preg_replace('/[^0-9]/', '', $value);
         $this->attributes['client_number'] = $number;
+    }
+
+    /**
+     * Scope a query to only include devices of a given status.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  string|null  $status
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeStatus($query, $status)
+    {
+        if ($status) {
+            return $query->where('repair_status', $status);
+        }
+        return $query;
+    }
+
+    /**
+     * Scope a query to only include devices within a given date range.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  string|null  $dateRange
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeDateRange($query, $dateRange)
+    {
+        if (!$dateRange) {
+            return $query;
+        }
+
+        switch ($dateRange) {
+            case 'today':
+                return $query->whereDate('created_at', today());
+            case 'yesterday':
+                return $query->whereDate('created_at', today()->subDay());
+            case 'last_week':
+                return $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
+            case 'last_month':
+                return $query->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()]);
+            default:
+                return $query;
+        }
     }
 }
