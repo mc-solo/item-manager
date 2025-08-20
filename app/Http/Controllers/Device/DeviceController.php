@@ -10,11 +10,27 @@ use Illuminate\Validation\Rule;
 class DeviceController extends Controller
 {
     // return a listing of devices for /device route
-    public function index()
+    public function index(Request $request)
     {
-        // fetch all device with their progress logs
-        $devices = Device::with('progressLogs')->get();
-        return view('livewire.devices.index', compact('devices'));
+        $query = $request->input('search');
+        $devices = Device::with('progressLogs')
+            ->when($query, function ($q) use ($query) {
+                $q->where('client_number', 'like', "%{$query}%")
+                  ->orWhere('client_name', 'like', "%{$query}%");
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'devices' => $devices->toArray()
+            ]);
+        }
+
+        return view('livewire.devices.index', [
+            'devices' => $devices,
+            'search' => $query
+        ]);
     }
 
     // show the create device form
@@ -81,11 +97,28 @@ class DeviceController extends Controller
     }
 
     // delete a device from the database
-    public function destroy(Device $device)
+    public function destroy(Request $request, Device $device)
     {
         $device->delete();
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Device deleted successfully.']);
+        }
+
         return redirect()->route('devices.index')->with('success', 'Device deleted successfully.');
     }
 
+    public function search(Request $request)
+    {
+        $query = $request->input('search');
+        $devices = Device::with('progressLogs')
+            ->when($query, function ($q) use ($query) {
+                $q->where('client_number', 'like', "%{$query}%");
+            })
+            ->get();
 
+        return response()->json([
+            'devices' => $devices
+        ]);
+    }
 }

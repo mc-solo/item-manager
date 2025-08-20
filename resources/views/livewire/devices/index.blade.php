@@ -1,7 +1,23 @@
 @component('components.layouts.app')
 @section('title', __('Devices'))
 
-<div x-data="{ viewMode: 'table' }" class="flex flex-col gap-6 h-full">
+<div x-data="{
+    viewMode: 'table',
+    devices: @js($devices),
+    init() {
+        window.addEventListener('devices-updated', e => {
+            if (e.detail && e.detail.devices) {
+                this.devices = e.detail.devices;
+            }
+        });
+        
+        this.$el.addEventListener('device-deleted', e => {
+            if (e.detail && e.detail.deviceId) {
+                this.devices = this.devices.filter(device => device.id !== e.detail.deviceId);
+            }
+        });
+    }
+}" x-init="init()" class="flex flex-col gap-6 h-full">
     <div class="flex items-center justify-between gap-2">
         <div class="flex items-center gap-4">
             <h1 class="text-2xl font-bold">Devices</h1>
