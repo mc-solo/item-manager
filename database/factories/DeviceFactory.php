@@ -17,9 +17,9 @@ class DeviceFactory extends Factory
     public function definition(): array
     {
         return [
-            'order_number' => $this->faker->unique()->numerify('ORD-#####'),
+            'order_number' => $this->faker->unique()->numerify('TPB-#####'),
             'client_name' => $this->faker->name(),
-            'client_number' => $this->faker->phoneNumber(),
+            'client_number' => $this->faker->randomElement(['09', '07']) . $this->faker->numerify('########'),
             'device_type' => $this->faker->randomElement(['mobile', 'laptop', 'tablet', 'pc', 'mac', 'other']),
             'device_model' => $this->faker->word() . ' ' . $this->faker->bothify('Model-##'),
             'serial_number' => $this->faker->optional()->bothify('SN-########'),
