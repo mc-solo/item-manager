@@ -13,9 +13,9 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-neutral-200 dark:divide-neutral-800">
-                <template x-if="devices.length === 0">
+                <template x-if="noResults">
                     <tr>
-                        <td colspan="5" class="text-center py-4 text-neutral-500">No devices found for this number.</td>
+                        <td colspan="5" class="text-center py-4 text-neutral-500">No devices found for your search.</td>
                     </tr>
                 </template>
                 <template x-for="device in devices" :key="device.id">
@@ -59,9 +59,9 @@
     </div>
     <!-- Device Card Grid View -->
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-4" x-show="viewMode === 'grid'">
-        <template x-if="devices.length === 0">
+        <template x-if="noResults">
             <div class="col-span-full text-center py-4 text-neutral-500">
-                No devices found for this number.
+                No devices found for your search.
             </div>
         </template>
         <template x-for="device in devices" :key="device.id">
