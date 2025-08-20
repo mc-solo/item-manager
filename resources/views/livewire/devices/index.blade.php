@@ -4,18 +4,69 @@
 <div x-data="{
     viewMode: 'table',
     devices: @js($devices),
+    noResults: false,
+    isLoading: false,
+    search: '{{ request('search', '') }}',
+
     init() {
-        window.addEventListener('devices-updated', e => {
-            if (e.detail && e.detail.devices) {
-                this.devices = e.detail.devices;
-            }
-        });
-        
         this.$el.addEventListener('device-deleted', e => {
             if (e.detail && e.detail.deviceId) {
                 this.devices = this.devices.filter(device => device.id !== e.detail.deviceId);
             }
         });
+
+        this.$el.addEventListener('search-updated', e => {
+            this.search = e.detail.search;
+            this.fetchDevices();
+        });
+
+        this.noResults = this.devices.length === 0 && this.search.trim() !== '';
+
+        if (this.search) {
+            this.fetchDevices();
+        }
+    },
+
+    async fetchDevices() {
+        this.isLoading = true;
+        const searchQuery = this.search.trim();
+        const url = new URL('{{ route('devices.index') }}');
+        
+        if (searchQuery) {
+            url.searchParams.set('search', searchQuery);
+        }
+
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const fetchedDevices = await response.json();
+            this.devices = fetchedDevices;
+            this.noResults = this.devices.length === 0 && searchQuery !== '';
+
+            const browserUrl = new URL(window.location);
+            if (searchQuery) {
+                browserUrl.searchParams.set('search', searchQuery);
+            } else {
+                browserUrl.searchParams.delete('search');
+            }
+            window.history.pushState({}, '', browserUrl);
+
+        } catch (error) {
+            console.error('Error fetching devices:', error);
+            this.devices = [];
+            this.noResults = true;
+        } finally {
+            this.isLoading = false;
+        }
     }
 }" x-init="init()" class="flex flex-col gap-6 h-full">
     <div class="flex items-center justify-between gap-2">
