@@ -3,7 +3,7 @@
 
 <div x-data="{
     viewMode: 'table',
-    devices: @js($devices),
+    devices: @js($devices ?? []),
     noResults: false,
     isLoading: false,
     search: '{{ request('search', '') }}',
@@ -107,10 +107,12 @@
                 <div class="flex items-center gap-2">
                     <button
                         class="rounded-lg px-3 py-2 bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 font-medium transition"
-                        :class="{ 'ring-2 ring-blue-200': viewMode === 'table' }" @click="viewMode = 'table'">Table</button>
+                        :class="{ 'ring-2 ring-blue-200': viewMode === 'table' }"
+                        @click="viewMode = 'table'">Table</button>
                     <button
                         class="rounded-lg px-3 py-2 bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 font-medium transition"
-                        :class="{ 'ring-2 ring-blue-200': viewMode === 'grid' }" @click="viewMode = 'grid'">Grid</button>
+                        :class="{ 'ring-2 ring-blue-200': viewMode === 'grid' }"
+                        @click="viewMode = 'grid'">Grid</button>
                 </div>
                 @include('livewire.devices._filters')
             </div>
