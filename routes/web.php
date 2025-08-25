@@ -19,8 +19,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('settings/password', Password::class)->name('settings.password');
     Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
 
-    Route::view('devices', 'livewire.devices.index')->name('devices');
-    Route::get('devices/show/{device}', [DeviceController::class, 'show'])->name('devices.show');
+    // Devices routes moved to device.php
 });
 
 require __DIR__ . '/auth.php';
