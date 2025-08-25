@@ -14,20 +14,20 @@
         </a>
 
         <flux:navlist variant="outline">
-            <flux:navlist.group :heading="__('The')" class="grid">
-                <flux:navlist.item icon="chart-pie" :href="route('dashboard')"
+            <flux:navlist.group :heading="__('')" class="grid">
+                <!-- <flux:navlist.item icon="chart-pie" :href="route('dashboard')"
                     :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard | Summary') }}
+                </flux:navlist.item> -->
                 </flux:navlist.item>
-                </flux:navlist.item>
-                <flux:navlist.group :heading="__('Phone')" class="grid">
+                <flux:navlist.group :heading="__('Orders')" class="grid">
                     <flux:navlist.item icon="device-phone-mobile" :href="route('devices')"
                         :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Devices') }}</flux:navlist.item>
                 </flux:navlist.group>
-                <flux:navlist.group :heading="__('Boss')" class="grid">
+                <!-- <flux:navlist.group :heading="__('Boss')" class="grid">
                     <flux:navlist.item icon="users" :href="route('dashboard')"
                         :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Customers') }}
                     </flux:navlist.item>
-                </flux:navlist.group>
+                </flux:navlist.group> -->
         </flux:navlist>
 
         <flux:spacer />
