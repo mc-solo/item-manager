@@ -147,4 +147,22 @@ class DeviceController extends Controller
             'devices' => $devices
         ]);
     }
+
+    /**
+     * Mark a device as completed
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Device  $device
+     * @return \Illuminate\Http\Response
+     */
+    public function markAsCompleted(Request $request, Device $device)
+    {
+        $device->update(['repair_status' => 'completed']);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Device marked as completed successfully.']);
+        }
+
+        return redirect()->back()->with('success', 'Device marked as completed successfully.');
+    }
 }

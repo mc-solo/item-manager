@@ -35,21 +35,24 @@
                         </td>
                         <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
                             <a :href="'{{ url('devices/show') }}/' + device.id" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3">Details</a>
-                            <button @click="if(confirm('Are you sure you want to delete this device?')) { 
-                                fetch('{{ url('devices/delete') }}/' + device.id, { 
-                                    method: 'DELETE',
+                            <button @click="if(confirm('Are you sure you want to mark this device as completed?')) { 
+                                fetch(`/devices/${device.id}/complete`, { 
+                                    method: 'POST',
                                     headers: {
                                         'X-CSRF-TOKEN': '{{ csrf_token() }}',
                                         'Accept': 'application/json',
-                                        'Content-Type': 'application/json'
+                                        'Content-Type': 'application/json',
+                                        'X-Requested-With': 'XMLHttpRequest'
                                     }
                                 }).then(response => {
                                     if (response.ok) {
-                                        $dispatch('device-deleted', { deviceId: device.id });
+                                        $dispatch('device-updated', { deviceId: device.id, status: 'completed' });
+                                        // Reload the page to reflect the status change
+                                        window.location.reload();
                                     }
                                 });
-                            }" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
-                                Delete
+                            }" class="inline-flex items-center px-3 py-1.5 border border-gray-200 text-xs font-medium rounded cursor-pointer text-black bg-white hover:bg-gray-50 dark:bg-neutral-700 dark:text-white dark:border-neutral-600 dark:hover:bg-neutral-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500" :disabled="device.repair_status === 'completed'" :class="{'opacity-50 cursor-not-allowed': device.repair_status === 'completed'}">
+                                <span x-text="device.repair_status === 'completed' ? 'Completed' : 'Mark as Completed'"></span>
                             </button>
                         </td>
                     </tr>
@@ -101,21 +104,24 @@
                     <a :href="'{{ url('devices/show') }}/' + device.id" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-blue-700 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         View Details
                     </a>
-                    <button @click="if(confirm('Are you sure you want to delete this device?')) { 
-                        fetch('{{ url('devices/delete') }}/' + device.id, { 
-                            method: 'DELETE',
+                    <button @click="if(confirm('Are you sure you want to mark this device as completed?')) { 
+                        fetch(`/devices/${device.id}/complete`, { 
+                            method: 'POST',
                             headers: {
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
                                 'Accept': 'application/json',
-                                'Content-Type': 'application/json'
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
                             }
                         }).then(response => {
                             if (response.ok) {
-                                $dispatch('device-deleted', { deviceId: device.id });
+                                $dispatch('device-updated', { deviceId: device.id, status: 'completed' });
+                                // Reload the page to reflect the status change
+                                window.location.reload();
                             }
                         });
-                    }" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-red-700 bg-red-100 hover:bg-red-200 dark:bg-red-900 dark:text-red-200 dark:hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                        Delete
+                    }" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-green-700 bg-green-100 hover:bg-green-200 dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" :disabled="device.repair_status === 'completed'" :class="{'opacity-50 cursor-not-allowed': device.repair_status === 'completed'}">
+                        <span x-text="device.repair_status === 'completed' ? 'Completed' : 'Mark as Completed'"></span>
                     </button>
                 </div>
             </div>
