@@ -15,9 +15,9 @@
 
         <flux:navlist variant="outline">
             <flux:navlist.group :heading="__('')" class="grid">
-                <!-- <flux:navlist.item icon="chart-pie" :href="route('dashboard')"
+                <flux:navlist.item icon="chart-pie" :href="route('dashboard')"
                     :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard | Summary') }}
-                </flux:navlist.item> -->
+                </flux:navlist.item>
                 </flux:navlist.item>
                 <flux:navlist.group :heading="__('Orders')" class="grid">
                     <flux:navlist.item icon="device-phone-mobile" :href="route('devices.index')"
