@@ -5,12 +5,13 @@ use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Device\DeviceController;
+use App\Http\Controllers\Dashboard\DashboardController;
 
 Route::redirect('/', '/login')->name('home');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+});
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
