@@ -23,6 +23,7 @@ class Device extends Model
         'imei',
         'issue_description',
         'repair_status',
+        'amount',
         'created_at',
         'updated_at',
     ];
