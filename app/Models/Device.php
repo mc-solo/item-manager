@@ -107,4 +107,8 @@ class Device extends Model
                 return $query;
         }
     }
+
+    public function transaction() {
+        return $this->hasMany(Transaction::class, 'device_id');
+    }
 }
