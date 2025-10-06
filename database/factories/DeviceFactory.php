@@ -26,6 +26,7 @@ class DeviceFactory extends Factory
             'imei' => $this->faker->optional()->numerify('###############'),
             'issue_description' => $this->faker->optional()->sentence(8),
             'repair_status' => $this->faker->randomElement(['pending', 'in_progress', 'completed', 'cancelled', 'delivered']),
+            'amount' => $this->faker->randomFloat(2, 0, 5000),
         ];
     }
 }

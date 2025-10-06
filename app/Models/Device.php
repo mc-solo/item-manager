@@ -23,6 +23,7 @@ class Device extends Model
         'imei',
         'issue_description',
         'repair_status',
+        'amount',
         'created_at',
         'updated_at',
     ];
@@ -105,5 +106,9 @@ class Device extends Model
             default:
                 return $query;
         }
+    }
+
+    public function transaction() {
+        return $this->hasMany(Transaction::class, 'device_id');
     }
 }
