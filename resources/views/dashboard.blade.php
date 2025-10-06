@@ -3,7 +3,7 @@
         <!-- Header -->
         <div class="border-b border-gray-200 dark:border-gray-800 px-6 py-4">
             <div class="flex justify-between items-center">
-                <h1 class="text-2xl font-light text-black dark:text-white">Income Dashboard</h1>
+                <h1 class="text-2xl font-light text-black dark:text-white">Transaction Dashboard</h1>
                 <div class="flex items-center space-x-4">
                     <!-- Date Range Selector -->
                     <div class="relative">
@@ -28,13 +28,13 @@
 
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
-            <!-- Total Income -->
+            <!-- Completed Repairs Total -->
             <div class="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6">
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Total Income</p>
-                        <p class="text-3xl font-light text-black dark:text-white mt-2">$12,458</p>
-                        <p class="text-green-600 dark:text-green-400 text-sm mt-1">+12% from last period</p>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Income from completed repairs [ ETB ]</p>
+                        <p class="text-3xl font-light text-black dark:text-white mt-2">{{ number_format($totalCompletedAmount, 2) }}</p>
+                        <p class="text-green-600 dark:text-green-400 text-sm mt-1">Total revenue from completed repairs</p>
                     </div>
                     <div class="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
                         <svg class="w-6 h-6 text-black dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -48,8 +48,8 @@
             <div class="bg-white dark:bg-neutral-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6">
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Avg. Transaction</p>
-                        <p class="text-3xl font-light text-black dark:text-white mt-2">$247</p>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Avg. Daily Transactions</p>
+                        <p class="text-3xl font-light text-black dark:text-white mt-2">ETB 47</p>
                         <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Across all sources</p>
                     </div>
                     <div class="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
@@ -65,7 +65,7 @@
                 <div class="flex justify-between items-start">
                     <div>
                         <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Transactions</p>
-                        <p class="text-3xl font-light text-black dark:text-white mt-2">48</p>
+                        <p class="text-3xl font-light text-black dark:text-white mt-2">47</p>
                         <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">This period</p>
                     </div>
                     <div class="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
@@ -133,7 +133,7 @@
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
                             <div class="w-3 h-3 rounded-full bg-black dark:bg-white mr-3"></div>
-                            <span class="text-black dark:text-white">Consulting</span>
+                            <span class="text-black dark:text-white">FRP [USB]</span>
                         </div>
                         <div class="text-right">
                             <p class="text-black dark:text-white font-medium">$5,240</p>
@@ -145,7 +145,7 @@
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
                             <div class="w-3 h-3 rounded-full bg-gray-400 dark:bg-gray-600 mr-3"></div>
-                            <span class="text-black dark:text-white">Product Sales</span>
+                            <span class="text-black dark:text-white">FRP [ISP]</span>
                         </div>
                         <div class="text-right">
                             <p class="text-black dark:text-white font-medium">$3,890</p>
@@ -157,7 +157,7 @@
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
                             <div class="w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-700 mr-3"></div>
-                            <span class="text-black dark:text-white">Services</span>
+                            <span class="text-black dark:text-white">MDM</span>
                         </div>
                         <div class="text-right">
                             <p class="text-black dark:text-white font-medium">$2,150</p>
@@ -169,7 +169,7 @@
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
                             <div class="w-3 h-3 rounded-full bg-gray-200 dark:bg-gray-800 mr-3"></div>
-                            <span class="text-black dark:text-white">Other</span>
+                            <span class="text-black dark:text-white">Other Services</span>
                         </div>
                         <div class="text-right">
                             <p class="text-black dark:text-white font-medium">$1,178</p>
