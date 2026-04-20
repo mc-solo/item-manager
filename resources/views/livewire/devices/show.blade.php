@@ -3,6 +3,24 @@
 
 <div class="max-w-3xl mx-auto p-6">
     <h1 class="text-2xl font-bold mb-6 text-neutral-900 dark:text-neutral-100">Device Details</h1>
+    @if (session('order_created'))
+        <div
+            class="mb-6 rounded-xl border border-green-200 bg-green-50 px-4 py-4 dark:border-green-800 dark:bg-green-900/30">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p class="text-sm font-medium text-green-800 dark:text-green-200">Order added successfully.</p>
+                <div class="flex items-center gap-2">
+                    <a href="{{ route('devices.index') }}"
+                        class="inline-flex items-center rounded-lg bg-neutral-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-neutral-700 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200">
+                        Back to Devices
+                    </a>
+                    <a href="{{ route('devices.index', ['open_create' => 1]) }}"
+                        class="inline-flex items-center rounded-lg border border-green-300 px-3 py-2 text-sm font-semibold text-green-800 transition hover:bg-green-100 dark:border-green-700 dark:text-green-200 dark:hover:bg-green-900/40">
+                        Add Another Order
+                    </a>
+                </div>
+            </div>
+        </div>
+    @endif
     <div class="bg-neutral-100 dark:bg-neutral-900 rounded-xl shadow-lg p-6 mb-6">
         <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>

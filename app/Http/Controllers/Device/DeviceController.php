@@ -6,7 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreDeviceRequest;
 use App\Http\Requests\UpdateDeviceRequest;
 use App\Models\Device;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class DeviceController extends Controller
 {
@@ -24,19 +27,19 @@ class DeviceController extends Controller
             'request_data' => $request->all(),
             'url' => $request->fullUrl()
         ]);
-        
+
         $query = Device::with('progressLogs')
             ->status($status)
             ->dateRange($dateRange);
-            
+
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('client_number', 'like', "%{$search}%")
-                  ->orWhere('client_name', 'like', "%{$search}%")
-                  ->orWhere('order_number', 'like', "%{$search}%")
-                  ->orWhere('device_model', 'like', "%{$search}%");
+                    ->orWhere('client_name', 'like', "%{$search}%")
+                    ->orWhere('order_number', 'like', "%{$search}%")
+                    ->orWhere('device_model', 'like', "%{$search}%");
             });
-            
+
             // Log the raw SQL query for debugging
             \Log::info('Search query', [
                 'sql' => $query->toSql(),
@@ -44,17 +47,17 @@ class DeviceController extends Controller
                 'full_sql' => vsprintf(str_replace('?', "'%s'", $query->toSql()), $query->getBindings())
             ]);
         }
-        
-        $devices = $query->orderBy('created_at', 'desc')->get();
-        
+
+        $devices = $query->latest('created_at')->latest('id')->get();
+
         \Log::info('Search results', [
             'search_term' => $search,
             'result_count' => $devices->count(),
             'first_few_results' => $devices->take(3)->toArray()
         ]);
-        
+
         // Format the devices data
-        $formattedDevices = $devices->map(function($device) {
+        $formattedDevices = $devices->map(function (Device $device) {
             return array_merge($device->toArray(), [
                 'created_at' => $device->created_at->toDateTimeString(),
                 'updated_at' => $device->updated_at->toDateTimeString(),
@@ -74,7 +77,7 @@ class DeviceController extends Controller
     // show the create device form
     public function create()
     {
-        return view('livewire.devices.device-create');
+        return redirect()->route('devices.index', ['open_create' => 1]);
     }
 
     // stores a new device
@@ -84,12 +87,12 @@ class DeviceController extends Controller
         do {
             $orderNumber = 'TPB-' . str_pad(random_int(0, 99999), 5, '0', STR_PAD_LEFT);
         } while (Device::where('order_number', $orderNumber)->exists());
-        
+
         $validated = $request->validated();
         $validated['order_number'] = $orderNumber;
-        
+
         $device = Device::create($validated);
-        
+
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'success' => true,
@@ -97,8 +100,9 @@ class DeviceController extends Controller
                 'data' => $device
             ]);
         }
-        
-        return redirect()->route('device.show', $device);
+
+        return redirect()->route('device.show', $device)
+            ->with('order_created', true);
     }
 
     // show a specific device with all its details
@@ -141,6 +145,8 @@ class DeviceController extends Controller
             ->when($query, function ($q) use ($query) {
                 $q->where('client_number', 'like', "%{$query}%");
             })
+            ->latest('created_at')
+            ->latest('id')
             ->get();
 
         return response()->json([
@@ -153,9 +159,9 @@ class DeviceController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Device  $device
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse|RedirectResponse
      */
-    public function markAsCompleted(Request $request, Device $device)
+    public function markAsCompleted(Request $request, Device $device): Response
     {
         $device->update(['repair_status' => 'completed']);
 
