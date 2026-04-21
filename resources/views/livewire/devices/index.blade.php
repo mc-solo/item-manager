@@ -21,6 +21,7 @@
     createForm: {
         client_name: '',
         client_number: '',
+        amount: '',
         device_type: 'mobile',
         device_model: '',
         serial_number: '',
@@ -106,6 +107,7 @@
         this.createForm = {
             client_name: '',
             client_number: '',
+            amount: '',
             device_type: 'mobile',
             device_model: '',
             serial_number: '',
@@ -149,6 +151,27 @@
             return this.setFieldError(field, null);
         }
 
+        if (field === 'amount') {
+            if (textValue === '' || textValue === null || textValue === undefined) {
+                return this.setFieldError(field, 'Amount is required.');
+            }
+
+            const parsedAmount = Number(textValue);
+            if (Number.isNaN(parsedAmount)) {
+                return this.setFieldError(field, 'Amount must be a valid number.');
+            }
+
+            if (parsedAmount < 0) {
+                return this.setFieldError(field, 'Amount must be 0 or greater.');
+            }
+
+            if (parsedAmount > 999999.99) {
+                return this.setFieldError(field, 'Amount must not exceed 999999.99.');
+            }
+
+            return this.setFieldError(field, null);
+        }
+
         if (field === 'device_type') {
             if (!allowedDeviceTypes.includes(textValue)) return this.setFieldError(field, 'Please select a valid device type.');
             return this.setFieldError(field, null);
@@ -187,6 +210,7 @@
         const fields = [
             'client_name',
             'client_number',
+            'amount',
             'device_type',
             'device_model',
             'serial_number',
@@ -418,6 +442,19 @@
                         required>
                     <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Format: 09XXXXXXXX or 07XXXXXXXX.</p>
                     <p class="mt-1 text-xs text-red-600" x-text="createValidationErrors.client_number?.[0]"></p>
+                </div>
+
+                <div>
+                    <label class="mb-1 block font-medium text-neutral-700 dark:text-neutral-200">Amount (ETB)</label>
+                    <input type="number" name="amount" x-model.number="createForm.amount"
+                        @blur="createTouched.amount = true; validateCreateField('amount')"
+                        @input="if (createTouched.amount) validateCreateField('amount')" min="0" max="999999.99"
+                        step="0.01" placeholder="0.00"
+                        class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 focus:ring-2 focus:ring-blue-200 dark:border-neutral-700 dark:bg-neutral-800"
+                        :class="{ 'border-red-500 ring-2 ring-red-100 dark:border-red-500 dark:ring-red-900/40': createValidationErrors.amount }"
+                        required>
+                    <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Enter the service amount in ETB.</p>
+                    <p class="mt-1 text-xs text-red-600" x-text="createValidationErrors.amount?.[0]"></p>
                 </div>
 
                 <div>

@@ -29,6 +29,7 @@ class StoreDeviceRequest extends FormRequest
                 'regex:/^0[79]\d{8}$/',
                 'max:10',
             ],
+            'amount' => 'required|numeric|min:0|max:999999.99',
             'device_type' => 'required|in:mobile,laptop,tablet,pc,mac,other',
             'device_model' => 'required|string|max:255',
             'serial_number' => 'nullable|string|max:100',
