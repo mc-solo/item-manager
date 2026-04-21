@@ -8,6 +8,7 @@
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Order #</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Client</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Device | Model</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Amount</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Status</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Actions</th>
                 </tr>
@@ -15,7 +16,7 @@
             <tbody class="divide-y divide-neutral-200 dark:divide-neutral-800">
                 <template x-if="noResults">
                     <tr>
-                        <td colspan="5" class="text-center py-4 text-neutral-500">No devices found for your search.</td>
+                        <td colspan="6" class="text-center py-4 text-neutral-500">No devices found for your search.</td>
                     </tr>
                 </template>
                 <template x-for="device in devices" :key="device.id">
@@ -29,6 +30,9 @@
                             <span
                                 x-text="device.device_type.charAt(0).toUpperCase() + device.device_type.slice(1)"></span>
                             <span x-text="device.device_model"></span>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <span x-text="Number(device.amount ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ETB'"></span>
                         </td>
                         <td class="px-4 py-3 whitespace-nowrap">
                             <span x-text="device.repair_status"></span>
@@ -95,6 +99,10 @@
                         <div class="text-sm">
                             <span class="font-medium text-neutral-700 dark:text-neutral-300" x-text="device.device_type.charAt(0).toUpperCase() + device.device_type.slice(1)"></span>
                             <span class="text-neutral-600 dark:text-neutral-400" x-text="device.device_model"></span>
+                        </div>
+                        <div class="text-sm mt-1">
+                            <span class="font-medium text-neutral-700 dark:text-neutral-300">Amount:</span>
+                            <span class="text-neutral-600 dark:text-neutral-400" x-text="Number(device.amount ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ETB'"></span>
                         </div>
                         <div class="text-xs text-neutral-500 dark:text-neutral-400 mt-1" x-text="device.issue_description"></div>
                     </div>

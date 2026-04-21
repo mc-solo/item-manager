@@ -44,6 +44,10 @@
                 <dd class="text-neutral-900 dark:text-neutral-100">{{ $device->device_model }}</dd>
             </div>
             <div>
+                <dt class="font-medium text-neutral-700 dark:text-neutral-200">Amount to Pay</dt>
+                <dd class="text-neutral-900 dark:text-neutral-100">{{ number_format((float) $device->amount, 2) }} ETB</dd>
+            </div>
+            <div>
                 <dt class="font-medium text-neutral-700 dark:text-neutral-200">Serial Number</dt>
                 <dd class="text-neutral-900 dark:text-neutral-100">{{ $device->serial_number ?? '-' }}</dd>
             </div>
