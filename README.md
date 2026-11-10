@@ -15,6 +15,8 @@ This is your personal item management system, built to help you keep track of al
 **Advanced Search and Filtering** - Search by client, order number, model, serial number, IMEI and issue. Filter by status, device type, amount range and date (today, yesterday, this week, last week, this month, last month, or a custom range), and sort by date, amount, client or order number.
 **Bulk Actions** - Tick devices in the list, then mark them pending, in progress, completed, cancelled or delivered in one go. Bulk delete is admin only.
 **Export** - Export the currently filtered list as CSV from the Devices page.
+**Dashboard** - Real numbers only: orders by status, income from completed repairs, today and this week, payments recorded, completed income for the last 7 days, amount by device type, oldest open orders, and recent orders. Admins also see user counts with a link to manage users.
+**Print Order** - From an order page or the device list, print a clean receipt for the customer with order number, client, device, issue and amount to pay, plus signature lines.
 
 ## What's Coming Next
 

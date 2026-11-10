@@ -107,6 +107,8 @@
         @endif
     </div>
     <div class="flex justify-end mt-6 gap-2">
+        <a href="{{ route('device.print', $device) }}" target="_blank"
+            class="px-4 py-2 bg-neutral-900 text-white rounded-lg shadow hover:bg-neutral-700 font-semibold transition">Print Order</a>
         @can('update', $device)
         <a href="{{ route('device.edit', $device) }}"
             class="px-4 py-2 bg-green-200 text-black hover:bg-green-300 rounded-lg shadow hover:bg-blue-700 font-semibold transition">Edit</a>

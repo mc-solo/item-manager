@@ -58,6 +58,7 @@
                         </td>
                         <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
                             <a :href="'{{ url('devices/show') }}/' + device.id" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3">Details</a>
+                            <a :href="'{{ url('devices/print') }}/' + device.id" target="_blank" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3">Print</a>
                             <button @click="if(confirm('Are you sure you want to mark this device as completed?')) { 
                                 fetch(`/devices/${device.id}/complete`, { 
                                     method: 'POST',

@@ -118,6 +118,19 @@ class DeviceController extends Controller
         return view('livewire.devices.show', compact('device'));
     }
 
+    /**
+     * Printable receipt to hand to the customer when they leave
+     * their device, and to bring back on collection.
+     */
+    public function print(Device $device)
+    {
+        Gate::authorize('view', $device);
+
+        $device->load(['progressLogs', 'transaction']);
+
+        return view('livewire.devices.print', compact('device'));
+    }
+
     public function edit(Device $device)
     {
         Gate::authorize('update', $device);

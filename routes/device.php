@@ -13,6 +13,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('devices/index', [DeviceController::class, 'index'])->name('devices.index');
     Route::get('devices/show/{device}', [DeviceController::class, 'show'])->name('device.show');
+    Route::get('devices/print/{device}', [DeviceController::class, 'print'])->name('device.print');
     Route::get('devices/edit/{device}', [DeviceController::class, 'edit'])->name('device.edit');
     Route::post('devices/store', [DeviceController::class, 'store'])->name('device.store');
     Route::put('devices/update/{device}', [DeviceController::class, 'update'])->name('device.update');
