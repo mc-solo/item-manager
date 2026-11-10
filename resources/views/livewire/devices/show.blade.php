@@ -68,6 +68,7 @@
                             'in_progress' => 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200',
                             'completed' => 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200',
                             'cancelled' => 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200',
+                            'delivered' => 'bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-200',
                         ];
                     @endphp
                     <span
@@ -106,8 +107,11 @@
         @endif
     </div>
     <div class="flex justify-end mt-6 gap-2">
+        @can('update', $device)
         <a href="{{ route('device.edit', $device) }}"
             class="px-4 py-2 bg-green-200 text-black hover:bg-green-300 rounded-lg shadow hover:bg-blue-700 font-semibold transition">Edit</a>
+        @endcan
+        @can('delete', $device)
         <form method="POST" action="{{ route('device.destroy', $device) }}"
             onsubmit="return confirm('Are you sure you want to delete this device?');">
             @csrf
@@ -115,6 +119,7 @@
             <button type="submit"
                 class="px-4 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 font-semibold transition cursor-pointer">Delete</button>
         </form>
+        @endcan
     </div>
 </div>
 @endcomponent

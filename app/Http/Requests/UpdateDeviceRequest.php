@@ -2,14 +2,20 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-
 class UpdateDeviceRequest extends StoreDeviceRequest
 {
     // extend all validation rules from StoreDeviceRequest
     public function rules(): array
     {
-        $rules = parent::rules();
-        return $rules;
+        return parent::rules();
+    }
+
+    public function authorize(): bool
+    {
+        $device = $this->route('device');
+
+        return $device
+            ? ($this->user()?->can('update', $device) ?? false)
+            : false;
     }
 }

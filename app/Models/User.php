@@ -18,11 +18,33 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
+    public const ROLE_ADMIN = 'admin';
+
+    public const ROLE_STAFF = 'staff';
+
+    public const ROLES = [self::ROLE_ADMIN, self::ROLE_STAFF];
+
     protected $fillable = [
         'name',
         'email',
         'password',
+        'role',
     ];
+
+    public function isAdmin(): bool
+    {
+        return $this->role === self::ROLE_ADMIN;
+    }
+
+    public function isStaff(): bool
+    {
+        return $this->role === self::ROLE_STAFF;
+    }
+
+    public function canManageUsers(): bool
+    {
+        return $this->isAdmin();
+    }
 
     /**
      * The attributes that should be hidden for serialization.

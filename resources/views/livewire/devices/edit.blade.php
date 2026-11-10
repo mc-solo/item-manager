@@ -26,7 +26,7 @@
         <div class="col-span-1">
             <label for="amount" class="block font-medium mb-1 text-neutral-700 dark:text-neutral-200">
                 Amount to Pay</label>
-            <input type="number" name="amount" id="amount" min="0" step="100"
+            <input type="number" name="amount" id="amount" min="0" step="100" value="{{ old('amount', $device->amount) }}"
                 class="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 focus:ring-2 focus:ring-blue-200 transition"
                 required>
         </div>
@@ -81,6 +81,7 @@
                 <option value="in_progress" @selected($device->repair_status == 'in_progress')>In Progress</option>
                 <option value="completed" @selected($device->repair_status == 'completed')>Completed</option>
                 <option value="cancelled" @selected($device->repair_status == 'cancelled')>Cancelled</option>
+                <option value="delivered" @selected($device->repair_status == 'delivered')>Delivered</option>
             </select>
         </div>
         <div class="col-span-1 md:col-span-2 flex justify-end mt-4">

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Device;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreDeviceRequest extends FormRequest
@@ -11,7 +12,7 @@ class StoreDeviceRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can('create', Device::class) ?? false;
     }
 
     /**

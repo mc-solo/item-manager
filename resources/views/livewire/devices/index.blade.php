@@ -32,6 +32,17 @@
     search: '{{ request('search', '') }}',
     status: '{{ request('status', '') }}',
     dateRange: '{{ request('date_range', '') }}',
+    deviceType: '{{ request('device_type', '') }}',
+    dateFrom: '{{ request('date_from', '') }}',
+    dateTo: '{{ request('date_to', '') }}',
+    amountMin: '{{ request('amount_min', '') }}',
+    amountMax: '{{ request('amount_max', '') }}',
+    sortBy: '{{ request('sort_by', 'created_at') }}',
+    sortDir: '{{ request('sort_dir', 'desc') }}',
+    selected: [],
+    bulkAction: '',
+    isBulkWorking: false,
+    isAdmin: {{ auth()->user()?->isAdmin() ? 'true' : 'false' }},
 
     init() {
         this.$el.addEventListener('device-deleted', e => {
@@ -45,9 +56,9 @@
             this.fetchDevices();
         });
 
-        this.noResults = this.devices.length === 0 && (this.search.trim() !== '' || this.status.trim() !== '' || this.dateRange.trim() !== '');
+        this.noResults = this.devices.length === 0 && this.hasActiveFilters();
 
-        if (this.search || this.status || this.dateRange) {
+        if (this.search || this.status || this.dateRange || this.deviceType || this.amountMin || this.amountMax) {
             this.fetchDevices();
         }
 
@@ -58,6 +69,97 @@
             const query = params.toString();
             const cleanUrl = query ? `${window.location.pathname}?${query}` : window.location.pathname;
             window.history.replaceState({}, '', cleanUrl);
+        }
+    },
+
+    hasActiveFilters() {
+        return this.search.trim() !== '' || this.status.trim() !== '' || this.dateRange.trim() !== '' || this.deviceType.trim() !== '' || this.amountMin !== '' || this.amountMax !== '';
+    },
+
+    clearFilters() {
+        this.search = '';
+        this.status = '';
+        this.dateRange = '';
+        this.deviceType = '';
+        this.dateFrom = '';
+        this.dateTo = '';
+        this.amountMin = '';
+        this.amountMax = '';
+        this.sortBy = 'created_at';
+        this.sortDir = 'desc';
+        this.selected = [];
+        this.fetchDevices();
+    },
+
+    toggleSelect(id) {
+        const index = this.selected.indexOf(id);
+        if (index === -1) {
+            this.selected.push(id);
+        } else {
+            this.selected.splice(index, 1);
+        }
+    },
+
+    toggleSelectAll(event) {
+        this.selected = event.target.checked ? this.devices.map(device => device.id) : [];
+    },
+
+    filterParams(url) {
+        const set = (key, value) => {
+            if (value !== '' && value !== null && value !== undefined) url.searchParams.set(key, value);
+        };
+        set('search', this.search.trim());
+        set('status', this.status.trim());
+        set('device_type', this.deviceType.trim());
+        set('date_range', this.dateRange.trim());
+        set('date_from', this.dateFrom);
+        set('date_to', this.dateTo);
+        set('amount_min', this.amountMin);
+        set('amount_max', this.amountMax);
+        set('sort_by', this.sortBy);
+        set('sort_dir', this.sortDir);
+        return url;
+    },
+
+    exportFiltered() {
+        window.location = this.filterParams(new URL('{{ route('devices.export') }}')).toString();
+    },
+
+    async applyBulk() {
+        if (!this.bulkAction || this.selected.length === 0) {
+            this.showToast('error', 'Select devices and an action first.');
+            return;
+        }
+        if (this.bulkAction === 'delete' && !confirm(`Delete ${this.selected.length} device(s)? This cannot be undone.`)) {
+            return;
+        }
+        this.isBulkWorking = true;
+        try {
+            const response = await fetch('{{ route('devices.bulk') }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ ids: this.selected, action: this.bulkAction }),
+            });
+            const result = await response.json();
+            if (response.status === 403) {
+                throw new Error('Only admins can delete devices.');
+            }
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || 'Bulk action failed.');
+            }
+            this.selected = [];
+            this.bulkAction = '';
+            await this.fetchDevices();
+            this.showToast('success', result.message);
+        } catch (error) {
+            this.showToast('error', error.message || 'Bulk action failed.');
+        } finally {
+            this.isBulkWorking = false;
         }
     },
 
@@ -281,6 +383,12 @@
             this.search = '';
             this.status = '';
             this.dateRange = '';
+            this.deviceType = '';
+            this.dateFrom = '';
+            this.dateTo = '';
+            this.amountMin = '';
+            this.amountMax = '';
+            this.selected = [];
             await this.fetchDevices();
             const createdOrderNumber = result?.data?.order_number;
             this.showToast('success', 'Order created successfully.', createdOrderNumber);
@@ -294,20 +402,7 @@
 
     async fetchDevices() {
         this.isLoading = true;
-        const searchQuery = this.search.trim();
-        const statusQuery = this.status.trim();
-        const dateRangeQuery = this.dateRange.trim();
-        const url = new URL('{{ route('devices.index') }}');
-        
-        if (searchQuery) {
-            url.searchParams.set('search', searchQuery);
-        }
-        if (statusQuery) {
-            url.searchParams.set('status', statusQuery);
-        }
-        if (dateRangeQuery) {
-            url.searchParams.set('date_range', dateRangeQuery);
-        }
+        const url = this.filterParams(new URL('{{ route('devices.index') }}'));
 
         try {
             const response = await fetch(url, {
@@ -320,27 +415,13 @@
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            
+
             const fetchedDevices = await response.json();
             this.devices = fetchedDevices;
-            this.noResults = this.devices.length === 0 && (searchQuery !== '' || statusQuery !== '' || dateRangeQuery !== '');
+            this.selected = this.selected.filter(id => this.devices.some(device => device.id === id));
+            this.noResults = this.devices.length === 0 && this.hasActiveFilters();
 
-            const browserUrl = new URL(window.location);
-            if (searchQuery) {
-                browserUrl.searchParams.set('search', searchQuery);
-            } else {
-                browserUrl.searchParams.delete('search');
-            }
-            if (statusQuery) {
-                browserUrl.searchParams.set('status', statusQuery);
-            } else {
-                browserUrl.searchParams.delete('status');
-            }
-            if (dateRangeQuery) {
-                browserUrl.searchParams.set('date_range', dateRangeQuery);
-            } else {
-                browserUrl.searchParams.delete('date_range');
-            }
+            const browserUrl = this.filterParams(new URL(window.location));
             window.history.pushState({}, '', browserUrl);
 
         } catch (error) {
@@ -382,9 +463,15 @@
 
         <!-- Right side: Actions and Filters -->
         <div class="flex w-full sm:w-auto items-center justify-between gap-2">
+            @if($canCreate ?? true)
             <button type="button" @click="openCreateModal()"
                 class="inline-flex items-center justify-center rounded-md border border-transparent bg-neutral-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200 transition">
                 Add Order
+            </button>
+            @endif
+            <button type="button" @click="exportFiltered()"
+                class="inline-flex items-center justify-center rounded-md border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 shadow-sm hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 transition">
+                Export CSV
             </button>
 
             <div class="flex items-center gap-2">

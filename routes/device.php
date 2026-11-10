@@ -20,5 +20,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('devices/{device}/complete', [DeviceController::class, 'markAsCompleted'])->name('device.complete');
     Route::get('devices/create', [DeviceController::class, 'create'])->name('device.create');
     Route::get('devices/search', [DeviceController::class, 'search'])->name('devices.ajax-search');
+    Route::post('devices/bulk', [DeviceController::class, 'bulk'])->name('devices.bulk');
+    Route::get('devices/export', [DeviceController::class, 'export'])->name('devices.export');
 
 });

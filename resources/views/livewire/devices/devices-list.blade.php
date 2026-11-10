@@ -1,10 +1,28 @@
 <div>
+    <!-- Bulk actions bar -->
+    <div x-show="selected.length > 0" class="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-neutral-200 bg-white px-4 py-3 dark:border-neutral-700 dark:bg-neutral-900" style="display: none;">
+        <span class="text-sm font-medium"><span x-text="selected.length"></span> selected</span>
+        <select x-model="bulkAction" class="rounded-lg border border-neutral-300 bg-white px-2 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-800">
+            <option value="">Choose action</option>
+            <option value="mark_pending">Mark pending</option>
+            <option value="mark_in_progress">Mark in progress</option>
+            <option value="mark_completed">Mark completed</option>
+            <option value="mark_cancelled">Mark cancelled</option>
+            <option value="mark_delivered">Mark delivered</option>
+            <option value="delete" x-show="isAdmin">Delete (admin only)</option>
+        </select>
+        <button type="button" @click="applyBulk()" :disabled="isBulkWorking || !bulkAction" class="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50 dark:bg-neutral-100 dark:text-neutral-900">
+            <span x-show="!isBulkWorking">Apply</span><span x-show="isBulkWorking">Applying...</span>
+        </button>
+        <button type="button" @click="selected = []" class="rounded-lg border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700">Clear selection</button>
+    </div>
     <!-- Device Table View -->
     <div class="overflow-x-auto rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900"
         x-show="viewMode === 'table'">
         <table class="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700">
             <thead class="bg-neutral-50 dark:bg-neutral-800">
                 <tr>
+                    <th class="px-4 py-3 text-left"><input type="checkbox" @change="toggleSelectAll($event)" :checked="devices.length > 0 && selected.length === devices.length" aria-label="Select all devices"></th>
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Order #</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Client</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Device | Model</th>
@@ -16,11 +34,12 @@
             <tbody class="divide-y divide-neutral-200 dark:divide-neutral-800">
                 <template x-if="noResults">
                     <tr>
-                        <td colspan="6" class="text-center py-4 text-neutral-500">No devices found for your search.</td>
+                        <td colspan="7" class="text-center py-4 text-neutral-500">No devices found for your search.</td>
                     </tr>
                 </template>
                 <template x-for="device in devices" :key="device.id">
                     <tr>
+                        <td class="px-4 py-3"><input type="checkbox" :checked="selected.includes(device.id)" @change="toggleSelect(device.id)" aria-label="Select device"></td>
                         <td class="px-4 py-3 whitespace-nowrap" x-text="device.order_number"></td>
                         <td class="px-4 py-3 whitespace-nowrap">
                             <span x-text="device.client_name"></span><br>
