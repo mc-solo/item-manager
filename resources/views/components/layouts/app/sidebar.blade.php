@@ -42,11 +42,6 @@
             <flux:navlist.item icon="folder-git-2" href="https://github.com/mc-solo/item-manager" target="_blank">
                 {{ __('Repo | Docs') }}
             </flux:navlist.item>
-
-            <!-- <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire"
-                target="_blank">
-                {{ __('Documentation') }}
-            </flux:navlist.item> -->
         </flux:navlist>
 
         <!-- Desktop User Menu -->
