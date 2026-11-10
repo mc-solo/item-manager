@@ -9,26 +9,75 @@
         </svg>
     </button>
 
-    <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="transform opacity-0 scale-95" x-transition:enter-end="transform opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="transform opacity-100 scale-100" x-transition:leave-end="transform opacity-0 scale-95" class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-neutral-800 dark:ring-neutral-700" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
-        <div class="py-1" role="none">
-            <div class="px-4 py-2 text-sm font-semibold text-gray-900 dark:text-white">Filter by Status</div>
-            <select x-model="status" @change="fetchDevices(); open = false" class="w-full border-0 bg-transparent px-4 py-2 text-gray-700 focus:ring-0 dark:text-gray-200 dark:bg-neutral-800">
-                <option value="" class="bg-white dark:bg-neutral-800">All Statuses</option>
-                <option value="pending" class="bg-white dark:bg-neutral-800">Pending</option>
-                <option value="in_progress" class="bg-white dark:bg-neutral-800">In Progress</option>
-                <option value="completed" class="bg-white dark:bg-neutral-800">Completed</option>
-                <option value="cancelled" class="bg-white dark:bg-neutral-800">Cancelled</option>
-                <option value="delivered" class="bg-white dark:bg-neutral-800">Delivered</option>
-            </select>
-            <div class="border-t border-gray-200 dark:border-neutral-700"></div>
-            <div class="px-4 py-2 text-sm font-semibold text-gray-900 dark:text-white">Filter by Date</div>
-            <select x-model="dateRange" @change="fetchDevices(); open = false" class="w-full border-0 bg-transparent px-4 py-2 text-gray-700 focus:ring-0 dark:text-gray-200 dark:bg-neutral-800">
-                <option value="" class="bg-white dark:bg-neutral-800">All Time</option>
-                <option value="today" class="bg-white dark:bg-neutral-800">Today</option>
-                <option value="yesterday" class="bg-white dark:bg-neutral-800">Yesterday</option>
-                <option value="last_week" class="bg-white dark:bg-neutral-800">Last Week</option>
-                <option value="last_month" class="bg-white dark:bg-neutral-800">Last Month</option>
-            </select>
+    <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="transform opacity-0 scale-95" x-transition:enter-end="transform opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="transform opacity-100 scale-100" x-transition:leave-end="transform opacity-0 scale-95" class="absolute right-0 z-10 mt-2 w-72 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-neutral-800 dark:ring-neutral-700" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+        <div class="space-y-3 px-4 py-3" role="none">
+            <div>
+                <div class="py-1 text-sm font-semibold text-gray-900 dark:text-white">Filter by Status</div>
+                <select x-model="status" @change="fetchDevices()" class="w-full rounded-lg border border-neutral-300 bg-white px-2 py-2 text-sm text-gray-700 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-200">
+                    <option value="">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                    <option value="delivered">Delivered</option>
+                </select>
+            </div>
+            <div>
+                <div class="py-1 text-sm font-semibold text-gray-900 dark:text-white">Device Type</div>
+                <select x-model="deviceType" @change="fetchDevices()" class="w-full rounded-lg border border-neutral-300 bg-white px-2 py-2 text-sm text-gray-700 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-200">
+                    <option value="">All Types</option>
+                    <option value="mobile">Mobile</option>
+                    <option value="laptop">Laptop</option>
+                    <option value="tablet">Tablet</option>
+                    <option value="pc">PC</option>
+                    <option value="mac">Mac</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div>
+                <div class="py-1 text-sm font-semibold text-gray-900 dark:text-white">Filter by Date</div>
+                <select x-model="dateRange" @change="fetchDevices()" class="w-full rounded-lg border border-neutral-300 bg-white px-2 py-2 text-sm text-gray-700 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-200">
+                    <option value="">All Time</option>
+                    <option value="today">Today</option>
+                    <option value="yesterday">Yesterday</option>
+                    <option value="this_week">This Week</option>
+                    <option value="last_week">Last Week</option>
+                    <option value="this_month">This Month</option>
+                    <option value="last_month">Last Month</option>
+                    <option value="custom">Custom Range</option>
+                </select>
+                <div x-show="dateRange === 'custom'" class="mt-2 grid grid-cols-2 gap-2">
+                    <label class="text-xs text-gray-500">From
+                        <input type="date" x-model="dateFrom" @change="fetchDevices()" class="mt-1 w-full rounded-lg border border-neutral-300 bg-white px-2 py-1 text-sm dark:border-neutral-700 dark:bg-neutral-800">
+                    </label>
+                    <label class="text-xs text-gray-500">To
+                        <input type="date" x-model="dateTo" @change="fetchDevices()" class="mt-1 w-full rounded-lg border border-neutral-300 bg-white px-2 py-1 text-sm dark:border-neutral-700 dark:bg-neutral-800">
+                    </label>
+                </div>
+            </div>
+            <div>
+                <div class="py-1 text-sm font-semibold text-gray-900 dark:text-white">Amount (ETB)</div>
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="number" min="0" step="0.01" placeholder="Min" x-model="amountMin" @change="fetchDevices()" class="w-full rounded-lg border border-neutral-300 bg-white px-2 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-800">
+                    <input type="number" min="0" step="0.01" placeholder="Max" x-model="amountMax" @change="fetchDevices()" class="w-full rounded-lg border border-neutral-300 bg-white px-2 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-800">
+                </div>
+            </div>
+            <div>
+                <div class="py-1 text-sm font-semibold text-gray-900 dark:text-white">Sort By</div>
+                <div class="grid grid-cols-2 gap-2">
+                    <select x-model="sortBy" @change="fetchDevices()" class="w-full rounded-lg border border-neutral-300 bg-white px-2 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-200">
+                        <option value="created_at">Newest</option>
+                        <option value="amount">Amount</option>
+                        <option value="client_name">Client Name</option>
+                        <option value="order_number">Order Number</option>
+                    </select>
+                    <select x-model="sortDir" @change="fetchDevices()" class="w-full rounded-lg border border-neutral-300 bg-white px-2 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-200">
+                        <option value="desc">Descending</option>
+                        <option value="asc">Ascending</option>
+                    </select>
+                </div>
+            </div>
+            <button type="button" @click="clearFilters(); open = false" class="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-700">Clear all filters</button>
         </div>
     </div>
 </div>

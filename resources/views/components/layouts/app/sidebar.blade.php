@@ -19,6 +19,12 @@
                     :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard | Summary') }}
                 </flux:navlist.item>
                 </flux:navlist.item>
+                @can('manage-users')
+                <flux:navlist.group :heading="__('Admin')" class="grid">
+                    <flux:navlist.item icon="users" :href="route('admin.users.index')"
+                        :current="request()->routeIs('admin.users.*')" wire:navigate>{{ __('Users') }}</flux:navlist.item>
+                </flux:navlist.group>
+                @endcan
                 <flux:navlist.group :heading="__('Orders')" class="grid">
                     <flux:navlist.item icon="device-phone-mobile" :href="route('devices.index')"
                         :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Devices') }}</flux:navlist.item>

@@ -18,7 +18,8 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => 'The Phone Boss',
             'email' => 'boss@shop.com',
-            'password' => 'password'
+            'password' => 'password',
+            'role' => User::ROLE_ADMIN,
         ]);
         $this->call([
             DeviceSeeder::class,
