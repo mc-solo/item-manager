@@ -1,8 +1,8 @@
 <div>
     <!-- Bulk actions bar -->
     <div x-show="selected.length > 0" class="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-neutral-200 bg-white px-4 py-3 dark:border-neutral-700 dark:bg-neutral-900" style="display: none;">
-        <span class="text-sm font-medium"><span x-text="selected.length"></span> selected</span>
-        <select x-model="bulkAction" class="rounded-lg border border-neutral-300 bg-white px-2 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-800">
+        <span class="shrink-0 text-sm font-medium"><span x-text="selected.length"></span> selected</span>
+        <select x-model="bulkAction" class="min-w-0 flex-1 rounded-lg border border-neutral-300 bg-white px-2 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-800 sm:flex-none">
             <option value="">Choose action</option>
             <option value="mark_pending">Mark pending</option>
             <option value="mark_in_progress">Mark in progress</option>
@@ -11,24 +11,24 @@
             <option value="mark_delivered">Mark delivered</option>
             <option value="delete" x-show="isAdmin">Delete (admin only)</option>
         </select>
-        <button type="button" @click="applyBulk()" :disabled="isBulkWorking || !bulkAction" class="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50 dark:bg-neutral-100 dark:text-neutral-900">
+        <button type="button" @click="applyBulk()" :disabled="isBulkWorking || !bulkAction" class="shrink-0 rounded-lg bg-neutral-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50 dark:bg-neutral-100 dark:text-neutral-900">
             <span x-show="!isBulkWorking">Apply</span><span x-show="isBulkWorking">Applying...</span>
         </button>
-        <button type="button" @click="selected = []" class="rounded-lg border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700">Clear selection</button>
+        <button type="button" @click="selected = []" class="shrink-0 rounded-lg border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700">Clear selection</button>
     </div>
     <!-- Device Table View -->
     <div class="overflow-x-auto rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900"
         x-show="viewMode === 'table'">
-        <table class="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700">
+        <table class="min-w-full divide-y divide-neutral-200 text-sm dark:divide-neutral-700">
             <thead class="bg-neutral-50 dark:bg-neutral-800">
                 <tr>
                     <th class="px-4 py-3 text-left"><input type="checkbox" @change="toggleSelectAll($event)" :checked="devices.length > 0 && selected.length === devices.length" aria-label="Select all devices"></th>
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Order #</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Client</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Device | Model</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Amount</th>
+                    <th class="hidden px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider sm:table-cell">Device | Model</th>
+                    <th class="hidden px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider md:table-cell">Amount</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Status</th>
-                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Actions</th>
+                    <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider">Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-neutral-200 dark:divide-neutral-800">
@@ -38,46 +38,56 @@
                     </tr>
                 </template>
                 <template x-for="device in devices" :key="device.id">
-                    <tr>
+                    <tr class="align-middle">
                         <td class="px-4 py-3"><input type="checkbox" :checked="selected.includes(device.id)" @change="toggleSelect(device.id)" aria-label="Select device"></td>
-                        <td class="px-4 py-3 whitespace-nowrap" x-text="device.order_number"></td>
+                        <td class="px-4 py-3 whitespace-nowrap font-medium" x-text="device.order_number"></td>
                         <td class="px-4 py-3 whitespace-nowrap">
                             <span x-text="device.client_name"></span><br>
                             <span class="text-xs text-neutral-500" x-text="device.client_number"></span>
                         </td>
-                        <td class="px-4 py-3 whitespace-nowrap">
+                        <td class="hidden px-4 py-3 whitespace-nowrap sm:table-cell">
                             <span
                                 x-text="device.device_type.charAt(0).toUpperCase() + device.device_type.slice(1)"></span>
                             <span x-text="device.device_model"></span>
                         </td>
-                        <td class="px-4 py-3 whitespace-nowrap">
+                        <td class="hidden px-4 py-3 whitespace-nowrap md:table-cell">
                             <span x-text="Number(device.amount ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ETB'"></span>
                         </td>
                         <td class="px-4 py-3 whitespace-nowrap">
-                            <span x-text="device.repair_status"></span>
+                            <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+                                :class="{
+                                    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200': device.repair_status === 'pending',
+                                    'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200': device.repair_status === 'in_progress',
+                                    'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200': device.repair_status === 'completed',
+                                    'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200': device.repair_status === 'cancelled',
+                                    'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200': device.repair_status === 'delivered'
+                                }">
+                                <span x-text="device.repair_status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())"></span>
+                            </span>
                         </td>
-                        <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                            <a :href="'{{ url('devices/show') }}/' + device.id" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3">Details</a>
-                            <a :href="'{{ url('devices/print') }}/' + device.id" target="_blank" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3">Print</a>
-                            <button @click="if(confirm('Are you sure you want to mark this device as completed?')) { 
-                                fetch(`/devices/${device.id}/complete`, { 
-                                    method: 'POST',
-                                    headers: {
-                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                        'Accept': 'application/json',
-                                        'Content-Type': 'application/json',
-                                        'X-Requested-With': 'XMLHttpRequest'
-                                    }
-                                }).then(response => {
-                                    if (response.ok) {
-                                        $dispatch('device-updated', { deviceId: device.id, status: 'completed' });
-                                        // Reload the page to reflect the status change
-                                        window.location.reload();
-                                    }
-                                });
-                            }" class="inline-flex items-center px-3 py-1.5 border border-gray-200 text-xs font-medium rounded cursor-pointer text-black bg-white hover:bg-gray-50 dark:bg-neutral-700 dark:text-white dark:border-neutral-600 dark:hover:bg-neutral-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500" :disabled="device.repair_status === 'completed'" :class="{'opacity-50 cursor-not-allowed': device.repair_status === 'completed'}">
-                                <span x-text="device.repair_status === 'completed' ? 'Completed' : 'Mark as Completed'"></span>
-                            </button>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <div class="flex items-center justify-end gap-1">
+                                <a :href="'{{ url('devices/show') }}/' + device.id" title="View details" aria-label="View details" class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-blue-600 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-blue-400 dark:hover:bg-blue-900/30">
+                                    <flux:icon.eye class="size-5" />
+                                    <span class="sr-only">View details</span>
+                                </a>
+                                <a :href="'{{ url('devices/print') }}/' + device.id" target="_blank" title="Print order" aria-label="Print order" class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-neutral-600 hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-neutral-500 dark:text-neutral-300 dark:hover:bg-neutral-800">
+                                    <flux:icon.printer class="size-5" />
+                                    <span class="sr-only">Print order</span>
+                                </a>
+                                <a :href="'{{ url('devices/edit') }}/' + device.id" title="Edit device" aria-label="Edit device" class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-amber-600 hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-500 dark:text-amber-400 dark:hover:bg-amber-900/30">
+                                    <flux:icon.pencil-square class="size-5" />
+                                    <span class="sr-only">Edit device</span>
+                                </a>
+                                <button type="button" @click="completeDevice(device)" title="Mark as completed" aria-label="Mark as completed" class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-green-600 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed dark:text-green-400 dark:hover:bg-green-900/30" :disabled="device.repair_status === 'completed'">
+                                    <flux:icon.check-circle class="size-5" />
+                                    <span class="sr-only">Mark as completed</span>
+                                </button>
+                                <button type="button" x-show="isAdmin" @click="deleteDevice(device)" title="Delete device" aria-label="Delete device" class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 dark:text-red-400 dark:hover:bg-red-900/30">
+                                    <flux:icon.trash class="size-5" />
+                                    <span class="sr-only">Delete device</span>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 </template>
@@ -92,29 +102,30 @@
             </div>
         </template>
         <template x-for="device in devices" :key="device.id">
-            <div class="border rounded-lg overflow-hidden bg-white dark:bg-neutral-800 shadow-sm hover:shadow-md transition-shadow duration-200">
-                <div class="p-4">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <div class="font-bold text-lg text-neutral-900 dark:text-white" x-text="device.order_number"></div>
+            <div class="border rounded-lg overflow-hidden bg-white dark:bg-neutral-800 shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col">
+                <div class="p-4 flex-1">
+                    <div class="flex justify-between items-start gap-2">
+                        <div class="min-w-0">
+                            <div class="font-bold text-lg text-neutral-900 dark:text-white truncate" x-text="device.order_number"></div>
                             <div class="text-sm text-neutral-500 dark:text-neutral-400" x-text="'#' + device.id"></div>
                         </div>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                        <span class="inline-flex shrink-0 items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                             :class="{
                                 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200': device.repair_status === 'pending',
                                 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200': device.repair_status === 'in_progress',
                                 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200': device.repair_status === 'completed',
-                                'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200': device.repair_status === 'cancelled'
+                                'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200': device.repair_status === 'cancelled',
+                                'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200': device.repair_status === 'delivered'
                             }">
                             <span x-text="device.repair_status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())"></span>
                         </span>
                     </div>
-                    
+
                     <div class="mt-4">
-                        <div class="text-sm font-medium text-neutral-900 dark:text-white" x-text="device.client_name"></div>
+                        <div class="text-sm font-medium text-neutral-900 dark:text-white truncate" x-text="device.client_name"></div>
                         <div class="text-sm text-neutral-500 dark:text-neutral-400" x-text="device.client_number"></div>
                     </div>
-                    
+
                     <div class="mt-3">
                         <div class="text-sm">
                             <span class="font-medium text-neutral-700 dark:text-neutral-300" x-text="device.device_type.charAt(0).toUpperCase() + device.device_type.slice(1)"></span>
@@ -124,32 +135,30 @@
                             <span class="font-medium text-neutral-700 dark:text-neutral-300">Amount:</span>
                             <span class="text-neutral-600 dark:text-neutral-400" x-text="Number(device.amount ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ETB'"></span>
                         </div>
-                        <div class="text-xs text-neutral-500 dark:text-neutral-400 mt-1" x-text="device.issue_description"></div>
+                        <div class="text-xs text-neutral-500 dark:text-neutral-400 mt-1 line-clamp-2" x-text="device.issue_description"></div>
                     </div>
                 </div>
-                
-                <div class="bg-neutral-50 dark:bg-neutral-700/30 px-4 py-3 flex justify-end space-x-2 border-t border-neutral-200 dark:border-neutral-700">
-                    <a :href="'{{ url('devices/show') }}/' + device.id" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-blue-700 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        View Details
+
+                <div class="bg-neutral-50 dark:bg-neutral-700/30 px-4 py-3 flex flex-wrap items-center justify-end gap-1 border-t border-neutral-200 dark:border-neutral-700">
+                    <a :href="'{{ url('devices/show') }}/' + device.id" title="View details" aria-label="View details" class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-blue-600 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-blue-400 dark:hover:bg-blue-900/30">
+                        <flux:icon.eye class="size-5" />
+                        <span class="sr-only">View details</span>
                     </a>
-                    <button @click="if(confirm('Are you sure you want to mark this device as completed?')) { 
-                        fetch(`/devices/${device.id}/complete`, { 
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'Accept': 'application/json',
-                                'Content-Type': 'application/json',
-                                'X-Requested-With': 'XMLHttpRequest'
-                            }
-                        }).then(response => {
-                            if (response.ok) {
-                                $dispatch('device-updated', { deviceId: device.id, status: 'completed' });
-                                // Reload the page to reflect the status change
-                                window.location.reload();
-                            }
-                        });
-                    }" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-green-700 bg-green-100 hover:bg-green-200 dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" :disabled="device.repair_status === 'completed'" :class="{'opacity-50 cursor-not-allowed': device.repair_status === 'completed'}">
-                        <span x-text="device.repair_status === 'completed' ? 'Completed' : 'Mark as Completed'"></span>
+                    <a :href="'{{ url('devices/print') }}/' + device.id" target="_blank" title="Print order" aria-label="Print order" class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-neutral-600 hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-neutral-500 dark:text-neutral-300 dark:hover:bg-neutral-800">
+                        <flux:icon.printer class="size-5" />
+                        <span class="sr-only">Print order</span>
+                    </a>
+                    <a :href="'{{ url('devices/edit') }}/' + device.id" title="Edit device" aria-label="Edit device" class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-amber-600 hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-500 dark:text-amber-400 dark:hover:bg-amber-900/30">
+                        <flux:icon.pencil-square class="size-5" />
+                        <span class="sr-only">Edit device</span>
+                    </a>
+                    <button type="button" @click="completeDevice(device)" title="Mark as completed" aria-label="Mark as completed" class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-green-600 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed dark:text-green-400 dark:hover:bg-green-900/30" :disabled="device.repair_status === 'completed'">
+                        <flux:icon.check-circle class="size-5" />
+                        <span class="sr-only">Mark as completed</span>
+                    </button>
+                    <button type="button" x-show="isAdmin" @click="deleteDevice(device)" title="Delete device" aria-label="Delete device" class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 dark:text-red-400 dark:hover:bg-red-900/30">
+                        <flux:icon.trash class="size-5" />
+                        <span class="sr-only">Delete device</span>
                     </button>
                 </div>
             </div>

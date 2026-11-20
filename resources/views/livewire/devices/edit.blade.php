@@ -4,7 +4,7 @@
 <div class="max-w-2xl mx-auto p-4">
     <h1 class="text-2xl font-bold mb-6 text-neutral-900 dark:text-neutral-100">Edit Order Details</h1>
     <form method="POST" action="{{ route('device.update', $device) }}"
-        class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-neutral-100 dark:bg-neutral-900 rounded-xl shadow-lg p-6">
+        class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-neutral-100 dark:bg-neutral-900 rounded-xl shadow-lg p-4 sm:p-6">
         @csrf
         @method('PUT')
         <div class="col-span-1">
@@ -84,9 +84,11 @@
                 <option value="delivered" @selected($device->repair_status == 'delivered')>Delivered</option>
             </select>
         </div>
-        <div class="col-span-1 md:col-span-2 flex justify-end mt-4">
+        <div class="col-span-1 md:col-span-2 flex flex-col-reverse gap-2 mt-4 sm:flex-row sm:justify-end">
+            <a href="{{ route('device.show', $device) }}"
+                class="inline-flex w-full items-center justify-center rounded-lg border border-neutral-300 px-6 py-2 font-semibold text-neutral-700 hover:bg-neutral-100 transition sm:w-auto dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800">Cancel</a>
             <button type="submit"
-                class="px-6 py-2 bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900 rounded-lg shadow hover:bg-neutral-700 dark:hover:bg-neutral-200 font-semibold transition">Update
+                class="inline-flex w-full items-center justify-center px-6 py-2 bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900 rounded-lg shadow hover:bg-neutral-700 dark:hover:bg-neutral-200 font-semibold transition sm:w-auto">Update
                 Order</button>
         </div>
     </form>
