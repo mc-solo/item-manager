@@ -14,6 +14,10 @@
     },
     toastTimer: null,
     showCreateModal: false,
+    showDeleteModal: false,
+    deleteTarget: null,
+    deleteBulk: false,
+    bulkDeleteConfirmed: false,
     isCreating: false,
     createError: '',
     createValidationErrors: {},
@@ -134,7 +138,10 @@
             this.showToast('error', 'Select devices and an action first.');
             return;
         }
-        if (this.bulkAction === 'delete' && !confirm(`Delete ${this.selected.length} device(s)? This cannot be undone.`)) {
+        if (this.bulkAction === 'delete' && !this.bulkDeleteConfirmed) {
+            this.deleteBulk = true;
+            this.deleteTarget = null;
+            this.showDeleteModal = true;
             return;
         }
         this.isBulkWorking = true;
@@ -201,7 +208,30 @@
         if (!device || !this.isAdmin) {
             return;
         }
-        if (!confirm(`Delete ${device.order_number}? This cannot be undone.`)) {
+        this.deleteTarget = device;
+        this.deleteBulk = false;
+        this.showDeleteModal = true;
+    },
+
+    closeDeleteModal() {
+        this.showDeleteModal = false;
+        this.deleteTarget = null;
+        this.deleteBulk = false;
+    },
+
+    async confirmDelete() {
+        if (this.deleteBulk) {
+            this.bulkDeleteConfirmed = true;
+            this.showDeleteModal = false;
+            this.deleteBulk = false;
+            await this.applyBulk();
+            this.bulkDeleteConfirmed = false;
+            return;
+        }
+        const device = this.deleteTarget;
+        this.showDeleteModal = false;
+        this.deleteTarget = null;
+        if (!device) {
             return;
         }
         try {
@@ -502,9 +532,9 @@
         <div x-show="toast.show" x-transition.opacity.duration.200ms x-transition.scale.origin.bottom.right
             style="display: none;"
             class="pointer-events-auto flex w-full items-start gap-3 rounded-xl border border-neutral-300 bg-white px-4 py-3 text-black shadow-lg dark:border-neutral-300 dark:bg-white dark:text-black">
-            <div class="mt-0.5">
-                <span x-show="toast.type === 'success'">✅</span>
-                <span x-show="toast.type !== 'success'">⚠️</span>
+            <div class="mt-0.5 shrink-0">
+                <span x-show="toast.type === 'success'" class="flex h-6 w-6 items-center justify-center rounded-full bg-neutral-900 text-xs font-bold text-white dark:bg-neutral-100 dark:text-neutral-900">✓</span>
+                <span x-show="toast.type !== 'success'" class="flex h-6 w-6 items-center justify-center rounded-full border-2 border-neutral-900 text-xs font-bold text-neutral-900 dark:border-neutral-100 dark:text-neutral-100">!</span>
             </div>
             <div class="text-sm font-medium">
                 <template x-if="toast.type === 'success' && toast.orderNumber">
@@ -514,8 +544,8 @@
                     <p x-text="toast.message"></p>
                 </template>
             </div>
-            <button type="button" @click="hideToast()"
-                class="ml-2 text-xs text-black opacity-70 hover:opacity-100">✕</button>
+            <button type="button" @click.stop="hideToast()" aria-label="Dismiss notification"
+                class="pointer-events-auto ml-2 flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full text-sm text-black hover:bg-neutral-200 focus:outline-none">✕</button>
         </div>
     </div>
 
@@ -526,9 +556,10 @@
         </div>
         <div class="flex shrink-0 flex-wrap items-center gap-2">
             @if($canCreate ?? true)
-            <button type="button" @click="openCreateModal()"
-                class="inline-flex h-10 shrink-0 items-center justify-center rounded-md border border-transparent bg-neutral-900 px-4 text-sm font-medium text-white shadow-sm hover:bg-neutral-700 focus:outline-none transition dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200">
-                Add Order
+            <button type="button" @click="openCreateModal()" title="Add Order" aria-label="Add Order"
+                class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-transparent bg-neutral-900 text-white shadow-sm hover:bg-neutral-700 focus:outline-none transition dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200">
+                <flux:icon.plus class="size-5" />
+                <span class="sr-only">Add Order</span>
             </button>
             @endif
             @can('export', \App\Models\Device::class)
@@ -553,7 +584,7 @@
     </div>
 
     <div x-show="showCreateModal" x-transition.opacity class="fixed inset-0 z-50 flex items-center justify-center p-4"
-        style="display: none;" @keydown.escape.window="closeCreateModal()">
+        style="display: none; z-index: 99999;" @keydown.escape.window="closeCreateModal()">
         <div class="absolute inset-0 bg-black/50" @click="closeCreateModal()"></div>
         <div
             class="relative z-10 w-full max-w-2xl rounded-xl bg-white p-4 shadow-xl sm:p-6 dark:bg-neutral-900 max-h-[90vh] overflow-y-auto">
@@ -700,5 +731,29 @@
     </div>
 
     @include('livewire.devices.devices-list')
+
+    <!-- Delete confirmation modal -->
+    <div x-show="showDeleteModal" x-transition.opacity class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        style="display: none; z-index: 99999;" @keydown.escape.window="closeDeleteModal()">
+        <div class="absolute inset-0 bg-black/50" @click="closeDeleteModal()"></div>
+        <div class="relative w-full max-w-sm rounded-xl bg-white p-6 shadow-xl dark:bg-neutral-900" style="z-index: 1;">
+            <div class="flex items-start gap-3">
+                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400">
+                    <flux:icon.trash class="size-5" />
+                </span>
+                <div class="min-w-0">
+                    <h2 class="text-lg font-bold text-neutral-900 dark:text-neutral-100">Delete order?</h2>
+                    <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-300" x-show="deleteTarget">Order <span class="font-bold text-neutral-900 dark:text-neutral-100" x-text="deleteTarget?.order_number"></span> will be deleted. This cannot be undone.</p>
+                    <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-300" x-show="deleteBulk"><span class="font-bold text-neutral-900 dark:text-neutral-100" x-text="selected.length"></span> selected device(s) will be deleted. This cannot be undone.</p>
+                </div>
+            </div>
+            <div class="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                <button type="button" @click="closeDeleteModal()"
+                    class="w-full rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100 focus:outline-none sm:w-auto dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800">Cancel</button>
+                <button type="button" @click="confirmDelete()"
+                    class="w-full rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 focus:outline-none sm:w-auto">Delete</button>
+            </div>
+        </div>
+    </div>
 </div>
 @endcomponent
