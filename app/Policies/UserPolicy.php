@@ -16,6 +16,21 @@ class UserPolicy
         return $user->isAdmin();
     }
 
+    public function create(User $user): bool
+    {
+        return $user->isAdmin();
+    }
+
+    public function delete(User $user, User $target): bool
+    {
+        return $user->isAdmin() && ! $user->is($target);
+    }
+
+    public function resetPassword(User $user, User $target): bool
+    {
+        return $user->isAdmin();
+    }
+
     /**
      * Only admins can change roles. An admin cannot demote
      * themselves, that check lives in the controller so the last

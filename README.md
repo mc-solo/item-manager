@@ -11,7 +11,7 @@ This is your personal item management system, built to help you keep track of al
 **Responsive Design** - Works great on both desktop and mobile
 **Modern UI** - Built with a clean, user-friendly interface // elegant and minimal
 **Secure Authentication** - Keep your data safe with secure login //email + password
-**Roles (admin / staff)** - Admin can do everything, including deleting devices and managing users at `/admin/users`. Staff can create, view, edit and complete devices, but cannot delete them or change roles. New accounts start as staff; the seeded shop account (`boss@shop.com`) is admin.
+**Roles (admin / technical staff)** - Admin can do everything, including deleting devices and managing users. Staff are the technical staff: they can create, view, edit and complete devices, but cannot delete them, change roles, or open Manage Users. Manage Users is in Settings (admin only) and in the sidebar under Admin, at `/admin/users`. There the admin creates a staff user with a name, username, email and password; staff log in with their username or email plus that password. New accounts start as staff; the seeded shop account (`boss@shop.com`, username `boss`) is admin.
 **Advanced Search and Filtering** - Search by client, order number, model, serial number, IMEI and issue. Filter by status, device type, amount range and date (today, yesterday, this week, last week, this month, last month, or a custom range), and sort by date, amount, client or order number.
 **Bulk Actions** - Tick devices in the list, then mark them pending, in progress, completed, cancelled or delivered in one go. Bulk delete is admin only.
 **Export** - Export the currently filtered list as CSV from the Devices page.
@@ -38,7 +38,7 @@ I'm excited to share some of the exciting features I'm working on:
 2. Check out your dashboard for an overview //for now just go to the devices module
 3. Start adding and managing your items
 
-To make someone an admin, an existing admin changes their role at `/admin/users`. After pulling this change, run `php artisan migrate` to add the `role` column to users.
+To make someone an admin, an existing admin changes their role at `/admin/users`. After pulling this change, run `php artisan migrate` to add the `username` column to users (existing users get a username backfilled from their email).
 
 ## Need Help?
 
