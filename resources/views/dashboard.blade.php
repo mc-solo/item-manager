@@ -72,7 +72,7 @@
                 <h2 class="text-lg font-medium text-black dark:text-white mt-8 mb-4">Needs attention (oldest open orders)</h2>
                 @forelse ($needsAttention as $device)
                     <div class="flex items-center justify-between py-2">
-                        <a href="{{ route('device.show', $device) }}" class="text-blue-600 dark:text-blue-400">{{ $device->order_number }} - {{ $device->client_name }}</a>
+                        <a href="{{ route('device.show', $device) }}" class="text-neutral-900 underline dark:text-neutral-100">{{ $device->order_number }} - {{ $device->client_name }}</a>
                         <span class="text-sm text-gray-500 dark:text-gray-400">{{ $device->created_at->format('Y-m-d') }} - {{ ucfirst(str_replace('_', ' ', $device->repair_status)) }}</span>
                     </div>
                 @empty
@@ -117,7 +117,7 @@
                         <tbody>
                             @forelse ($recentDevices as $device)
                                 <tr class="border-b border-gray-100 dark:border-gray-900">
-                                    <td class="py-4"><a href="{{ route('device.show', $device) }}" class="text-blue-600 dark:text-blue-400">{{ $device->order_number }}</a></td>
+                                    <td class="py-4"><a href="{{ route('device.show', $device) }}" class="text-neutral-900 underline dark:text-neutral-100">{{ $device->order_number }}</a></td>
                                     <td class="py-4 text-black dark:text-white">{{ $device->client_name }}<br><span class="text-xs text-gray-500">{{ $device->client_number }}</span></td>
                                     <td class="py-4 text-gray-500 dark:text-gray-400">{{ ucfirst($device->device_type) }} {{ $device->device_model }}</td>
                                     <td class="py-4 text-gray-500 dark:text-gray-400">{{ ucfirst(str_replace('_', ' ', $device->repair_status)) }}</td>

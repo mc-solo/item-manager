@@ -5,16 +5,16 @@
     <h1 class="text-2xl font-bold mb-6 text-neutral-900 dark:text-neutral-100">Device Details</h1>
     @if (session('order_created'))
         <div
-            class="mb-6 rounded-xl border border-green-200 bg-green-50 px-4 py-4 dark:border-green-800 dark:bg-green-900/30">
+            class="mb-6 rounded-xl border border-neutral-300 bg-neutral-100 px-4 py-4 dark:border-neutral-700 dark:bg-neutral-800">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <p class="text-sm font-medium text-green-800 dark:text-green-200">Order added successfully.</p>
+                <p class="text-sm font-medium text-neutral-900 dark:text-neutral-100">Order added successfully.</p>
                 <div class="flex items-center gap-2">
                     <a href="{{ route('devices.index') }}"
                         class="inline-flex items-center rounded-lg bg-neutral-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-neutral-700 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200">
                         Back to Devices
                     </a>
                     <a href="{{ route('devices.index', ['open_create' => 1]) }}"
-                        class="inline-flex items-center rounded-lg border border-green-300 px-3 py-2 text-sm font-semibold text-green-800 transition hover:bg-green-100 dark:border-green-700 dark:text-green-200 dark:hover:bg-green-900/40">
+                        class="inline-flex items-center rounded-lg border border-neutral-300 px-3 py-2 text-sm font-semibold text-neutral-900 transition hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-100 dark:hover:bg-neutral-800">
                         Add Another Order
                     </a>
                 </div>
@@ -64,11 +64,11 @@
                 <dd class="text-neutral-900 dark:text-neutral-100">
                     @php
                         $statusColors = [
-                            'pending' => 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200',
-                            'in_progress' => 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200',
-                            'completed' => 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200',
-                            'cancelled' => 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200',
-                            'delivered' => 'bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-200',
+                            'pending' => 'bg-neutral-200 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-100',
+                            'in_progress' => 'bg-neutral-300 dark:bg-neutral-600 text-neutral-900 dark:text-white',
+                            'completed' => 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900',
+                            'cancelled' => 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400',
+                            'delivered' => 'bg-neutral-200 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-100',
                         ];
                     @endphp
                     <span
@@ -89,12 +89,12 @@
             <ul class="space-y-4">
                 @foreach($device->progressLogs as $log)
                     <li
-                        class="border-l-4 pl-4 {{ $log->status == 'completed' ? 'border-green-500' : ($log->status == 'in_progress' ? 'border-blue-500' : 'border-yellow-500') }}">
+                        class="border-l-4 pl-4 {{ $log->status == 'completed' ? 'border-neutral-900 dark:border-neutral-100' : 'border-neutral-300 dark:border-neutral-700' }}">
                         <div class="flex justify-between items-center">
                             <span
                                 class="font-medium text-neutral-800 dark:text-neutral-200">{{ $log->progress_description }}</span>
                             <span
-                                class="text-xs px-2 py-1 rounded {{ $log->status == 'completed' ? 'bg-green-100 text-green-800' : ($log->status == 'in_progress' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800') }}">
+                                class="text-xs px-2 py-1 rounded {{ 'bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-100' }}">
                                 {{ ucfirst(str_replace('_', ' ', $log->status)) }}
                             </span>
                         </div>
@@ -111,7 +111,7 @@
             class="inline-flex w-full items-center justify-center gap-2 px-4 py-2 bg-neutral-900 text-white rounded-lg shadow hover:bg-neutral-700 font-semibold transition sm:w-auto"><flux:icon.printer class="size-5" />Print Order</a>
         @can('update', $device)
         <a href="{{ route('device.edit', $device) }}"
-            class="inline-flex w-full items-center justify-center gap-2 px-4 py-2 bg-green-200 text-black hover:bg-green-300 rounded-lg shadow font-semibold transition sm:w-auto"><flux:icon.pencil-square class="size-5" />Edit</a>
+            class="inline-flex w-full items-center justify-center gap-2 px-4 py-2 bg-neutral-200 text-neutral-900 hover:bg-neutral-300 rounded-lg shadow font-semibold transition sm:w-auto dark:bg-neutral-700 dark:text-white dark:hover:bg-neutral-600"><flux:icon.pencil-square class="size-5" />Edit</a>
         @endcan
         @can('delete', $device)
         <form method="POST" action="{{ route('device.destroy', $device) }}" class="w-full sm:w-auto"
@@ -119,7 +119,7 @@
             @csrf
             @method('DELETE')
             <button type="submit"
-                class="inline-flex w-full items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 font-semibold transition cursor-pointer sm:w-auto"><flux:icon.trash class="size-5" />Delete</button>
+                class="inline-flex w-full items-center justify-center gap-2 px-4 py-2 bg-neutral-900 text-white rounded-lg shadow hover:bg-neutral-700 font-semibold transition cursor-pointer sm:w-auto dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200"><flux:icon.trash class="size-5" />Delete</button>
         </form>
         @endcan
     </div>

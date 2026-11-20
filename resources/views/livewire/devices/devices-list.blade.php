@@ -1,4 +1,4 @@
-<div>
+<div style="position: relative; z-index: 0;">
     <!-- Bulk actions bar -->
     <div x-show="selected.length > 0" class="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-neutral-200 bg-white px-4 py-3 dark:border-neutral-700 dark:bg-neutral-900" style="display: none;">
         <span class="shrink-0 text-sm font-medium"><span x-text="selected.length"></span> selected</span>
@@ -15,7 +15,7 @@
             <span x-show="!isBulkWorking">Apply</span><span x-show="isBulkWorking">Applying...</span>
         </button>
         <button type="button" @click="selected = []" class="shrink-0 rounded-lg border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700">Clear selection</button>
-        <button type="button" x-show="isAdmin" @click="bulkAction = 'delete'; applyBulk()" class="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50" :disabled="isBulkWorking">
+        <button type="button" x-show="isAdmin" @click="bulkAction = 'delete'; applyBulk()" class="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-neutral-900 px-3 py-2 text-sm font-semibold text-white hover:bg-neutral-700 focus:outline-none dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200 disabled:opacity-50" :disabled="isBulkWorking">
             <flux:icon.trash class="size-4" />
             Delete selected
         </button>
@@ -60,34 +60,34 @@
                         <td class="px-4 py-3 whitespace-nowrap">
                             <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
                                 :class="{
-                                    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200': device.repair_status === 'pending',
-                                    'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200': device.repair_status === 'in_progress',
-                                    'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200': device.repair_status === 'completed',
-                                    'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200': device.repair_status === 'cancelled',
-                                    'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200': device.repair_status === 'delivered'
+                                    'bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-100': device.repair_status === 'pending',
+                                    'bg-neutral-300 text-neutral-900 dark:bg-neutral-600 dark:text-white': device.repair_status === 'in_progress',
+                                    'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900': device.repair_status === 'completed',
+                                    'bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400 line-through': device.repair_status === 'cancelled',
+                                    'bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-100': device.repair_status === 'delivered'
                                 }">
                                 <span x-text="device.repair_status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())"></span>
                             </span>
                         </td>
                         <td class="sticky right-0 whitespace-nowrap bg-white px-4 py-3 dark:bg-neutral-900">
                             <div class="flex flex-nowrap items-center justify-end gap-1">
-                                <a :href="'{{ url('devices/show') }}/' + device.id" title="View details" aria-label="View details" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-blue-600 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-blue-400 dark:hover:bg-blue-900/30">
+                                <a :href="'{{ url('devices/show') }}/' + device.id" title="View details" aria-label="View details" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-neutral-700 hover:bg-neutral-100 focus:outline-none dark:text-neutral-200 dark:hover:bg-neutral-800">
                                     <flux:icon.eye class="size-5" />
                                     <span class="sr-only">View details</span>
                                 </a>
-                                <a :href="'{{ url('devices/print') }}/' + device.id" target="_blank" title="Print order" aria-label="Print order" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-neutral-600 hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-neutral-500 dark:text-neutral-300 dark:hover:bg-neutral-800">
+                                <a :href="'{{ url('devices/print') }}/' + device.id" target="_blank" title="Print order" aria-label="Print order" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-neutral-700 hover:bg-neutral-100 focus:outline-none dark:text-neutral-200 dark:hover:bg-neutral-800">
                                     <flux:icon.printer class="size-5" />
                                     <span class="sr-only">Print order</span>
                                 </a>
-                                <a :href="'{{ url('devices/edit') }}/' + device.id" title="Edit device" aria-label="Edit device" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-amber-600 hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-500 dark:text-amber-400 dark:hover:bg-amber-900/30">
+                                <a :href="'{{ url('devices/edit') }}/' + device.id" title="Edit device" aria-label="Edit device" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-neutral-700 hover:bg-neutral-100 focus:outline-none dark:text-neutral-200 dark:hover:bg-neutral-800">
                                     <flux:icon.pencil-square class="size-5" />
                                     <span class="sr-only">Edit device</span>
                                 </a>
-                                <button type="button" @click="completeDevice(device)" title="Mark as completed" aria-label="Mark as completed" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-green-600 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed dark:text-green-400 dark:hover:bg-green-900/30" :disabled="device.repair_status === 'completed'">
+                                <button type="button" @click="completeDevice(device)" title="Mark as completed" aria-label="Mark as completed" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-neutral-700 hover:bg-neutral-100 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed dark:text-neutral-200 dark:hover:bg-neutral-800" :disabled="device.repair_status === 'completed'">
                                     <flux:icon.check-circle class="size-5" />
                                     <span class="sr-only">Mark as completed</span>
                                 </button>
-                                <button type="button" x-show="isAdmin" @click="deleteDevice(device)" title="Delete device" aria-label="Delete device" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 dark:text-red-400 dark:hover:bg-red-900/30">
+                                <button type="button" x-show="isAdmin" @click="deleteDevice(device)" title="Delete device" aria-label="Delete device" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-neutral-700 hover:bg-neutral-100 focus:outline-none dark:text-neutral-200 dark:hover:bg-neutral-800">
                                     <flux:icon.trash class="size-5" />
                                     <span class="sr-only">Delete device</span>
                                 </button>
@@ -115,11 +115,11 @@
                         </div>
                         <span class="inline-flex shrink-0 items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                             :class="{
-                                'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200': device.repair_status === 'pending',
-                                'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200': device.repair_status === 'in_progress',
-                                'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200': device.repair_status === 'completed',
-                                'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200': device.repair_status === 'cancelled',
-                                'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200': device.repair_status === 'delivered'
+                                'bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-100': device.repair_status === 'pending',
+                                'bg-neutral-300 text-neutral-900 dark:bg-neutral-600 dark:text-white': device.repair_status === 'in_progress',
+                                'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900': device.repair_status === 'completed',
+                                'bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400 line-through': device.repair_status === 'cancelled',
+                                'bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-100': device.repair_status === 'delivered'
                             }">
                             <span x-text="device.repair_status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())"></span>
                         </span>
@@ -144,23 +144,23 @@
                 </div>
 
                 <div class="bg-neutral-50 dark:bg-neutral-700/30 px-4 py-3 flex flex-wrap items-center justify-end gap-1 border-t border-neutral-200 dark:border-neutral-700">
-                    <a :href="'{{ url('devices/show') }}/' + device.id" title="View details" aria-label="View details" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-blue-600 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-blue-400 dark:hover:bg-blue-900/30">
+                    <a :href="'{{ url('devices/show') }}/' + device.id" title="View details" aria-label="View details" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-neutral-700 hover:bg-neutral-100 focus:outline-none dark:text-neutral-200 dark:hover:bg-neutral-800">
                         <flux:icon.eye class="size-5" />
                         <span class="sr-only">View details</span>
                     </a>
-                    <a :href="'{{ url('devices/print') }}/' + device.id" target="_blank" title="Print order" aria-label="Print order" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-neutral-600 hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-neutral-500 dark:text-neutral-300 dark:hover:bg-neutral-800">
+                    <a :href="'{{ url('devices/print') }}/' + device.id" target="_blank" title="Print order" aria-label="Print order" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-neutral-700 hover:bg-neutral-100 focus:outline-none dark:text-neutral-200 dark:hover:bg-neutral-800">
                         <flux:icon.printer class="size-5" />
                         <span class="sr-only">Print order</span>
                     </a>
-                    <a :href="'{{ url('devices/edit') }}/' + device.id" title="Edit device" aria-label="Edit device" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-amber-600 hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-500 dark:text-amber-400 dark:hover:bg-amber-900/30">
+                    <a :href="'{{ url('devices/edit') }}/' + device.id" title="Edit device" aria-label="Edit device" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-neutral-700 hover:bg-neutral-100 focus:outline-none dark:text-neutral-200 dark:hover:bg-neutral-800">
                         <flux:icon.pencil-square class="size-5" />
                         <span class="sr-only">Edit device</span>
                     </a>
-                    <button type="button" @click="completeDevice(device)" title="Mark as completed" aria-label="Mark as completed" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-green-600 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed dark:text-green-400 dark:hover:bg-green-900/30" :disabled="device.repair_status === 'completed'">
+                    <button type="button" @click="completeDevice(device)" title="Mark as completed" aria-label="Mark as completed" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-neutral-700 hover:bg-neutral-100 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed dark:text-neutral-200 dark:hover:bg-neutral-800" :disabled="device.repair_status === 'completed'">
                         <flux:icon.check-circle class="size-5" />
                         <span class="sr-only">Mark as completed</span>
                     </button>
-                    <button type="button" x-show="isAdmin" @click="deleteDevice(device)" title="Delete device" aria-label="Delete device" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 dark:text-red-400 dark:hover:bg-red-900/30">
+                    <button type="button" x-show="isAdmin" @click="deleteDevice(device)" title="Delete device" aria-label="Delete device" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-neutral-700 hover:bg-neutral-100 focus:outline-none dark:text-neutral-200 dark:hover:bg-neutral-800">
                         <flux:icon.trash class="size-5" />
                         <span class="sr-only">Delete device</span>
                     </button>
