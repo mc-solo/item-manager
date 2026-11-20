@@ -498,7 +498,7 @@
         }
     }
 }" x-init="init()" class="flex flex-col gap-6 h-full">
-    <div class="pointer-events-none fixed inset-x-4 bottom-4 z-[70] sm:inset-x-auto sm:right-4 sm:w-full sm:max-w-sm">
+    <div class="pointer-events-none fixed inset-x-4 bottom-4 sm:inset-x-auto sm:right-4 sm:w-full sm:max-w-sm" style="z-index: 9999;">
         <div x-show="toast.show" x-transition.opacity.duration.200ms x-transition.scale.origin.bottom.right
             style="display: none;"
             class="pointer-events-auto flex w-full items-start gap-3 rounded-xl border border-neutral-300 bg-white px-4 py-3 text-black shadow-lg dark:border-neutral-300 dark:bg-white dark:text-black">
@@ -519,7 +519,7 @@
         </div>
     </div>
 
-    <div class="flex flex-wrap items-center gap-3">
+    <div class="flex flex-wrap items-center gap-3" style="position: relative; z-index: 50;">
         <h1 class="shrink-0 text-2xl font-bold leading-none">Devices</h1>
         <div class="min-w-40 flex-1">
             @include('livewire.devices.search-bar')
@@ -527,25 +527,25 @@
         <div class="flex shrink-0 flex-wrap items-center gap-2">
             @if($canCreate ?? true)
             <button type="button" @click="openCreateModal()"
-                class="inline-flex h-10 shrink-0 items-center justify-center rounded-md border border-transparent bg-neutral-900 px-4 text-sm font-medium text-white shadow-sm hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200">
+                class="inline-flex h-10 shrink-0 items-center justify-center rounded-md border border-transparent bg-neutral-900 px-4 text-sm font-medium text-white shadow-sm hover:bg-neutral-700 focus:outline-none transition dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200">
                 Add Order
             </button>
             @endif
             @can('export', \App\Models\Device::class)
             <button type="button" @click="exportFiltered()" title="Export CSV" aria-label="Export CSV"
-                class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-neutral-300 bg-white text-neutral-700 shadow-sm hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200">
+                class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-neutral-300 bg-white text-neutral-700 shadow-sm hover:bg-neutral-100 focus:outline-none transition dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200">
                 <flux:icon.arrow-down-tray class="size-5" />
                 <span class="sr-only">Export CSV</span>
             </button>
             @endcan
             <div class="flex shrink-0 items-center gap-2">
                 <button type="button" title="Table view" aria-label="Table view"
-                    class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-neutral-200 text-neutral-700 transition dark:bg-neutral-800 dark:text-neutral-200"
-                    :class="{ 'ring-2 ring-blue-500': viewMode === 'table' }"
+                    class="inline-flex h-10 w-10 items-center justify-center rounded-lg transition focus:outline-none"
+                    :class="viewMode === 'table' ? 'bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900' : 'bg-neutral-200 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200'"
                     @click="viewMode = 'table'"><flux:icon.table-cells class="size-5" /><span class="sr-only">Table view</span></button>
                 <button type="button" title="Grid view" aria-label="Grid view"
-                    class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-neutral-200 text-neutral-700 transition dark:bg-neutral-800 dark:text-neutral-200"
-                    :class="{ 'ring-2 ring-blue-500': viewMode === 'grid' }"
+                    class="inline-flex h-10 w-10 items-center justify-center rounded-lg transition focus:outline-none"
+                    :class="viewMode === 'grid' ? 'bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900' : 'bg-neutral-200 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200'"
                     @click="viewMode = 'grid'"><flux:icon.squares-2x2 class="size-5" /><span class="sr-only">Grid view</span></button>
             </div>
             @include('livewire.devices._filters')
@@ -564,7 +564,7 @@
             </div>
 
             <div x-show="createError"
-                class="mb-4 rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-700 dark:bg-red-900/30 dark:text-red-200"
+                class="mb-4 rounded-lg border border-neutral-300 bg-neutral-100 px-3 py-2 text-sm text-neutral-900 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
                 x-text="createError"></div>
 
             <form @submit.prevent="submitCreateOrder" class="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -573,11 +573,11 @@
                     <input type="text" name="client_name" x-model="createForm.client_name"
                         @blur="createTouched.client_name = true; validateCreateField('client_name')"
                         @input="if (createTouched.client_name) validateCreateField('client_name')" maxlength="255"
-                        class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 focus:ring-2 focus:ring-blue-200 dark:border-neutral-700 dark:bg-neutral-800"
-                        :class="{ 'border-red-500 ring-2 ring-red-100 dark:border-red-500 dark:ring-red-900/40': createValidationErrors.client_name }"
+                        class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 dark:border-neutral-700 dark:bg-neutral-800"
+                        :class="{ 'border-neutral-900 dark:border-neutral-100': createValidationErrors.client_name }"
                         required>
                     <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Enter the customer's full name.</p>
-                    <p class="mt-1 text-xs text-red-600" x-text="createValidationErrors.client_name?.[0]"></p>
+                    <p class="mt-1 text-xs text-neutral-900 dark:text-neutral-100" x-text="createValidationErrors.client_name?.[0]"></p>
                 </div>
 
                 <div>
@@ -586,11 +586,11 @@
                         @blur="createTouched.client_number = true; validateCreateField('client_number')"
                         @input="if (createTouched.client_number) validateCreateField('client_number')" maxlength="10"
                         inputmode="numeric" pattern="0[79][0-9]{8}" placeholder="09XXXXXXXX"
-                        class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 focus:ring-2 focus:ring-blue-200 dark:border-neutral-700 dark:bg-neutral-800"
-                        :class="{ 'border-red-500 ring-2 ring-red-100 dark:border-red-500 dark:ring-red-900/40': createValidationErrors.client_number }"
+                        class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 dark:border-neutral-700 dark:bg-neutral-800"
+                        :class="{ 'border-neutral-900 dark:border-neutral-100': createValidationErrors.client_number }"
                         required>
                     <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Format: 09XXXXXXXX or 07XXXXXXXX.</p>
-                    <p class="mt-1 text-xs text-red-600" x-text="createValidationErrors.client_number?.[0]"></p>
+                    <p class="mt-1 text-xs text-neutral-900 dark:text-neutral-100" x-text="createValidationErrors.client_number?.[0]"></p>
                 </div>
 
                 <div>
@@ -599,19 +599,19 @@
                         @blur="createTouched.amount = true; validateCreateField('amount')"
                         @input="if (createTouched.amount) validateCreateField('amount')" min="0" max="999999.99"
                         step="0.01" placeholder="0.00"
-                        class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 focus:ring-2 focus:ring-blue-200 dark:border-neutral-700 dark:bg-neutral-800"
-                        :class="{ 'border-red-500 ring-2 ring-red-100 dark:border-red-500 dark:ring-red-900/40': createValidationErrors.amount }"
+                        class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 dark:border-neutral-700 dark:bg-neutral-800"
+                        :class="{ 'border-neutral-900 dark:border-neutral-100': createValidationErrors.amount }"
                         required>
                     <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Enter the service amount in ETB.</p>
-                    <p class="mt-1 text-xs text-red-600" x-text="createValidationErrors.amount?.[0]"></p>
+                    <p class="mt-1 text-xs text-neutral-900 dark:text-neutral-100" x-text="createValidationErrors.amount?.[0]"></p>
                 </div>
 
                 <div>
                     <label class="mb-1 block font-medium text-neutral-700 dark:text-neutral-200">Device Type</label>
                     <select name="device_type" x-model="createForm.device_type"
                         @change="createTouched.device_type = true; validateCreateField('device_type')"
-                        class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 focus:ring-2 focus:ring-blue-200 dark:border-neutral-700 dark:bg-neutral-800"
-                        :class="{ 'border-red-500 ring-2 ring-red-100 dark:border-red-500 dark:ring-red-900/40': createValidationErrors.device_type }"
+                        class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 dark:border-neutral-700 dark:bg-neutral-800"
+                        :class="{ 'border-neutral-900 dark:border-neutral-100': createValidationErrors.device_type }"
                         required>
                         <option value="mobile">Mobile</option>
                         <option value="laptop">Laptop</option>
@@ -620,7 +620,7 @@
                         <option value="mac">Mac</option>
                         <option value="other">Other</option>
                     </select>
-                    <p class="mt-1 text-xs text-red-600" x-text="createValidationErrors.device_type?.[0]"></p>
+                    <p class="mt-1 text-xs text-neutral-900 dark:text-neutral-100" x-text="createValidationErrors.device_type?.[0]"></p>
                 </div>
 
                 <div>
@@ -628,12 +628,12 @@
                     <input type="text" name="device_model" x-model="createForm.device_model"
                         @blur="createTouched.device_model = true; validateCreateField('device_model')"
                         @input="if (createTouched.device_model) validateCreateField('device_model')" maxlength="255"
-                        class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 focus:ring-2 focus:ring-blue-200 dark:border-neutral-700 dark:bg-neutral-800"
-                        :class="{ 'border-red-500 ring-2 ring-red-100 dark:border-red-500 dark:ring-red-900/40': createValidationErrors.device_model }"
+                        class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 dark:border-neutral-700 dark:bg-neutral-800"
+                        :class="{ 'border-neutral-900 dark:border-neutral-100': createValidationErrors.device_model }"
                         required>
                     <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Example: iPhone 13 Pro, Dell Latitude
                         5420.</p>
-                    <p class="mt-1 text-xs text-red-600" x-text="createValidationErrors.device_model?.[0]"></p>
+                    <p class="mt-1 text-xs text-neutral-900 dark:text-neutral-100" x-text="createValidationErrors.device_model?.[0]"></p>
                 </div>
 
                 <div>
@@ -641,9 +641,9 @@
                     <input type="text" name="serial_number" x-model="createForm.serial_number"
                         @blur="createTouched.serial_number = true; validateCreateField('serial_number')"
                         @input="if (createTouched.serial_number) validateCreateField('serial_number')" maxlength="100"
-                        class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 focus:ring-2 focus:ring-blue-200 dark:border-neutral-700 dark:bg-neutral-800">
+                        class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 dark:border-neutral-700 dark:bg-neutral-800">
                     <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Optional. Up to 100 characters.</p>
-                    <p class="mt-1 text-xs text-red-600" x-text="createValidationErrors.serial_number?.[0]"></p>
+                    <p class="mt-1 text-xs text-neutral-900 dark:text-neutral-100" x-text="createValidationErrors.serial_number?.[0]"></p>
                 </div>
 
                 <div>
@@ -651,10 +651,10 @@
                     <input type="text" name="imei" x-model="createForm.imei"
                         @blur="createTouched.imei = true; validateCreateField('imei')"
                         @input="if (createTouched.imei) validateCreateField('imei')" maxlength="100"
-                        class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 focus:ring-2 focus:ring-blue-200 dark:border-neutral-700 dark:bg-neutral-800">
+                        class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 dark:border-neutral-700 dark:bg-neutral-800">
                     <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Optional. Enter IMEI if available.
                     </p>
-                    <p class="mt-1 text-xs text-red-600" x-text="createValidationErrors.imei?.[0]"></p>
+                    <p class="mt-1 text-xs text-neutral-900 dark:text-neutral-100" x-text="createValidationErrors.imei?.[0]"></p>
                 </div>
 
                 <div class="md:col-span-2">
@@ -664,18 +664,18 @@
                         @blur="createTouched.issue_description = true; validateCreateField('issue_description')"
                         @input="if (createTouched.issue_description) validateCreateField('issue_description')"
                         maxlength="500"
-                        class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 focus:ring-2 focus:ring-blue-200 dark:border-neutral-700 dark:bg-neutral-800"></textarea>
+                        class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 dark:border-neutral-700 dark:bg-neutral-800"></textarea>
                     <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Optional. Describe the issue (max 500
                         characters).</p>
-                    <p class="mt-1 text-xs text-red-600" x-text="createValidationErrors.issue_description?.[0]"></p>
+                    <p class="mt-1 text-xs text-neutral-900 dark:text-neutral-100" x-text="createValidationErrors.issue_description?.[0]"></p>
                 </div>
 
                 <div class="md:col-span-2">
                     <label class="mb-1 block font-medium text-neutral-700 dark:text-neutral-200">Repair Status</label>
                     <select name="repair_status" x-model="createForm.repair_status"
                         @change="createTouched.repair_status = true; validateCreateField('repair_status')"
-                        class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 focus:ring-2 focus:ring-blue-200 dark:border-neutral-700 dark:bg-neutral-800"
-                        :class="{ 'border-red-500 ring-2 ring-red-100 dark:border-red-500 dark:ring-red-900/40': createValidationErrors.repair_status }"
+                        class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 dark:border-neutral-700 dark:bg-neutral-800"
+                        :class="{ 'border-neutral-900 dark:border-neutral-100': createValidationErrors.repair_status }"
                         required>
                         <option value="pending">Pending</option>
                         <option value="in_progress">In Progress</option>
@@ -683,7 +683,7 @@
                         <option value="cancelled">Cancelled</option>
                         <option value="delivered">Delivered</option>
                     </select>
-                    <p class="mt-1 text-xs text-red-600" x-text="createValidationErrors.repair_status?.[0]"></p>
+                    <p class="mt-1 text-xs text-neutral-900 dark:text-neutral-100" x-text="createValidationErrors.repair_status?.[0]"></p>
                 </div>
 
                 <div class="md:col-span-2 flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">

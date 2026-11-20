@@ -12,7 +12,7 @@
                 Name</label>
             <input type="text" name="client_name" id="client_name"
                 value="{{ old('client_name', $device->client_name) }}"
-                class="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 focus:ring-2 focus:ring-blue-200 transition"
+                class="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 transition"
                 required>
         </div>
         <div class="col-span-1">
@@ -20,21 +20,21 @@
                 Number</label>
             <input type="text" name="client_number" id="client_number"
                 value="{{ old('client_number', $device->client_number) }}"
-                class="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 focus:ring-2 focus:ring-blue-200 transition"
+                class="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 transition"
                 required>
         </div>
         <div class="col-span-1">
             <label for="amount" class="block font-medium mb-1 text-neutral-700 dark:text-neutral-200">
                 Amount to Pay</label>
             <input type="number" name="amount" id="amount" min="0" step="100" value="{{ old('amount', $device->amount) }}"
-                class="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 focus:ring-2 focus:ring-blue-200 transition"
+                class="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 transition"
                 required>
         </div>
         <div class="col-span-1">
             <label for="device_type" class="block font-medium mb-1 text-neutral-700 dark:text-neutral-200">Device
                 Type</label>
             <select name="device_type" id="device_type"
-                class="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 focus:ring-2 focus:ring-blue-200 transition"
+                class="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 transition"
                 required>
                 <option value="mobile" @selected($device->device_type == 'mobile')>Mobile</option>
                 <option value="laptop" @selected($device->device_type == 'laptop')>Laptop</option>
@@ -49,7 +49,7 @@
                 Model</label>
             <input type="text" name="device_model" id="device_model"
                 value="{{ old('device_model', $device->device_model) }}"
-                class="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 focus:ring-2 focus:ring-blue-200 transition"
+                class="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 transition"
                 required>
         </div>
         <div class="col-span-1">
@@ -57,25 +57,25 @@
                 Number</label>
             <input type="text" name="serial_number" id="serial_number"
                 value="{{ old('serial_number', $device->serial_number) }}"
-                class="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 focus:ring-2 focus:ring-blue-200 transition">
+                class="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 transition">
         </div>
         <div class="col-span-1">
             <label for="imei" class="block font-medium mb-1 text-neutral-700 dark:text-neutral-200">IMEI</label>
             <input type="text" name="imei" id="imei" value="{{ old('imei', $device->imei) }}"
-                class="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 focus:ring-2 focus:ring-blue-200 transition">
+                class="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 transition">
         </div>
         <div class="col-span-1 md:col-span-2">
             <label for="issue_description" class="block font-medium mb-1 text-neutral-700 dark:text-neutral-200">Issue
                 Description</label>
             <textarea name="issue_description" id="issue_description"
-                class="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 focus:ring-2 focus:ring-blue-200 transition"
+                class="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 transition"
                 rows="3">{{ old('issue_description', $device->issue_description) }}</textarea>
         </div>
         <div class="col-span-1 md:col-span-2">
             <label for="repair_status" class="block font-medium mb-1 text-neutral-700 dark:text-neutral-200">Repair
                 Status</label>
             <select name="repair_status" id="repair_status"
-                class="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 focus:ring-2 focus:ring-blue-200 transition"
+                class="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 transition"
                 required>
                 <option value="pending" @selected($device->repair_status == 'pending')>Pending</option>
                 <option value="in_progress" @selected($device->repair_status == 'in_progress')>In Progress</option>

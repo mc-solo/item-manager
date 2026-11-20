@@ -11,7 +11,7 @@
     }
 }">
     <input type="text" x-model="search" placeholder="search orders..."
-        class="h-10 w-full rounded-lg border border-neutral-300 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:bg-neutral-800 dark:text-white" />
+        class="h-10 w-full rounded-lg border border-neutral-300 px-4 pl-10 focus:outline-none dark:bg-neutral-800 dark:text-white" />
     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

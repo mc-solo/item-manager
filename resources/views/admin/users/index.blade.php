@@ -6,10 +6,10 @@
     <p class="mb-6 text-sm text-neutral-500">Admins can do everything, including deleting devices. Technical staff can create, edit and complete devices, but cannot delete them, change roles, or open this page. Staff log in with their username or email plus their password.</p>
 
     @if (session('success'))
-        <div class="mb-4 rounded-lg border border-green-300 bg-green-50 px-3 py-2 text-sm text-green-700 dark:border-green-700 dark:bg-green-900/30 dark:text-green-200">{{ session('success') }}</div>
+        <div class="mb-4 rounded-lg border border-neutral-300 bg-neutral-100 px-3 py-2 text-sm text-neutral-900 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100">{{ session('success') }}</div>
     @endif
     @if ($errors->any())
-        <div class="mb-4 rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-700 dark:bg-red-900/30 dark:text-red-200">{{ $errors->first() }}</div>
+        <div class="mb-4 rounded-lg border border-neutral-300 bg-neutral-100 px-3 py-2 text-sm text-neutral-900 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100">{{ $errors->first() }}</div>
     @endif
 
     <div class="mb-8 rounded-xl border border-neutral-200 bg-white p-4 shadow-sm sm:p-6 dark:border-neutral-700 dark:bg-neutral-900">
@@ -20,18 +20,18 @@
             <div>
                 <label for="name" class="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-200">Name</label>
                 <input type="text" name="name" id="name" value="{{ old('name') }}" placeholder="Miki" required maxlength="255"
-                    class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-200 dark:border-neutral-700 dark:bg-neutral-800">
+                    class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-800">
             </div>
             <div>
                 <label for="username" class="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-200">Username</label>
                 <input type="text" name="username" id="username" value="{{ old('username') }}" placeholder="miki" required minlength="3" maxlength="30" pattern="[a-z0-9._-]+"
-                    class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-200 dark:border-neutral-700 dark:bg-neutral-800">
+                    class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-800">
                 <p class="mt-1 text-xs text-neutral-500">Lowercase letters, numbers, dot, dash and underscore only.</p>
             </div>
             <div>
                 <label for="email" class="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-200">Email</label>
                 <input type="email" name="email" id="email" value="{{ old('email') }}" placeholder="miki@example.com" required maxlength="255"
-                    class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-200 dark:border-neutral-700 dark:bg-neutral-800">
+                    class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-800">
             </div>
             <div>
                 <label for="role" class="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-200">Role</label>
@@ -44,12 +44,12 @@
             <div>
                 <label for="password" class="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-200">Password</label>
                 <input type="password" name="password" id="password" required minlength="8" autocomplete="new-password"
-                    class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-200 dark:border-neutral-700 dark:bg-neutral-800">
+                    class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-800">
             </div>
             <div>
                 <label for="password_confirmation" class="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-200">Confirm password</label>
                 <input type="password" name="password_confirmation" id="password_confirmation" required minlength="8" autocomplete="new-password"
-                    class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-blue-200 dark:border-neutral-700 dark:bg-neutral-800">
+                    class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-800">
             </div>
             <div class="sm:col-span-2">
                 <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-neutral-900 px-4 py-2 text-sm font-semibold text-white hover:bg-neutral-700 sm:w-auto dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200">
@@ -85,7 +85,7 @@
                                     <option value="admin" @selected($user->role === 'admin')>Admin</option>
                                     <option value="staff" @selected($user->role === 'staff')>Technical staff</option>
                                 </select>
-                                <button type="submit" title="Save role" aria-label="Save role for {{ $user->name }}" class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-green-600 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500 dark:text-green-400 dark:hover:bg-green-900/30">
+                                <button type="submit" title="Save role" aria-label="Save role for {{ $user->name }}" class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-neutral-700 hover:bg-neutral-100 focus:outline-none dark:text-neutral-200 dark:hover:bg-neutral-800">
                                     <flux:icon.check class="size-5" />
                                     <span class="sr-only">Save role</span>
                                 </button>
@@ -98,7 +98,7 @@
                                     @method('PUT')
                                     <input type="password" name="password" placeholder="New password" required minlength="8" aria-label="New password for {{ $user->name }}"
                                         class="w-32 rounded-lg border border-neutral-300 bg-white px-2 py-1 text-sm dark:border-neutral-700 dark:bg-neutral-800">
-                                    <button type="submit" title="Reset password" aria-label="Reset password for {{ $user->name }}" class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-amber-600 hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-500 dark:text-amber-400 dark:hover:bg-amber-900/30">
+                                    <button type="submit" title="Reset password" aria-label="Reset password for {{ $user->name }}" class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-neutral-700 hover:bg-neutral-100 focus:outline-none dark:text-neutral-200 dark:hover:bg-neutral-800">
                                         <flux:icon.key class="size-5" />
                                         <span class="sr-only">Reset password</span>
                                     </button>
@@ -107,7 +107,7 @@
                                 <form method="POST" action="{{ route('admin.users.destroy', $user) }}" onsubmit="return confirm('Delete {{ $user->name }}? This cannot be undone.');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" title="Delete user" aria-label="Delete user {{ $user->name }}" class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 dark:text-red-400 dark:hover:bg-red-900/30">
+                                    <button type="submit" title="Delete user" aria-label="Delete user {{ $user->name }}" class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-neutral-700 hover:bg-neutral-100 focus:outline-none dark:text-neutral-200 dark:hover:bg-neutral-800">
                                         <flux:icon.trash class="size-5" />
                                         <span class="sr-only">Delete user</span>
                                     </button>
