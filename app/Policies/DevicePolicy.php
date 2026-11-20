@@ -34,7 +34,7 @@ class DevicePolicy
 
     public function export(User $user): bool
     {
-        return true;
+        return $user->isAdmin();
     }
 
     public function bulkUpdate(User $user): bool

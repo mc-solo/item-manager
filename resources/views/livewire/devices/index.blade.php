@@ -519,39 +519,36 @@
         </div>
     </div>
 
-    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <!-- Left side: Title and Search -->
-        <div class="flex w-full flex-col gap-3 sm:flex-row sm:items-center lg:w-auto">
-            <h1 class="shrink-0 text-2xl font-bold">Devices</h1>
+    <div class="flex flex-wrap items-center gap-3">
+        <h1 class="shrink-0 text-2xl font-bold leading-none">Devices</h1>
+        <div class="min-w-40 flex-1">
             @include('livewire.devices.search-bar')
         </div>
-
-        <!-- Right side: Actions and Filters -->
-        <div class="flex w-full flex-wrap items-center gap-2 lg:w-auto lg:justify-end">
+        <div class="flex shrink-0 flex-wrap items-center gap-2">
             @if($canCreate ?? true)
             <button type="button" @click="openCreateModal()"
-                class="inline-flex flex-1 items-center justify-center rounded-md border border-transparent bg-neutral-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition sm:flex-none dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200">
+                class="inline-flex h-10 shrink-0 items-center justify-center rounded-md border border-transparent bg-neutral-900 px-4 text-sm font-medium text-white shadow-sm hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200">
                 Add Order
             </button>
             @endif
-            <button type="button" @click="exportFiltered()"
-                class="inline-flex flex-1 items-center justify-center rounded-md border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 shadow-sm hover:bg-neutral-100 transition sm:flex-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200">
-                Export CSV
+            @can('export', \App\Models\Device::class)
+            <button type="button" @click="exportFiltered()" title="Export CSV" aria-label="Export CSV"
+                class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-neutral-300 bg-white text-neutral-700 shadow-sm hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200">
+                <flux:icon.arrow-down-tray class="size-5" />
+                <span class="sr-only">Export CSV</span>
             </button>
-
-            <div class="flex items-center gap-2">
-                <div class="flex shrink-0 items-center gap-2">
-                    <button type="button" title="Table view" aria-label="Table view"
-                        class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-neutral-200 text-neutral-700 transition dark:bg-neutral-800 dark:text-neutral-200"
-                        :class="{ 'ring-2 ring-blue-500': viewMode === 'table' }"
-                        @click="viewMode = 'table'"><flux:icon.table-cells class="size-5" /><span class="sr-only">Table view</span></button>
-                    <button type="button" title="Grid view" aria-label="Grid view"
-                        class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-neutral-200 text-neutral-700 transition dark:bg-neutral-800 dark:text-neutral-200"
-                        :class="{ 'ring-2 ring-blue-500': viewMode === 'grid' }"
-                        @click="viewMode = 'grid'"><flux:icon.squares-2x2 class="size-5" /><span class="sr-only">Grid view</span></button>
-                </div>
-                @include('livewire.devices._filters')
+            @endcan
+            <div class="flex shrink-0 items-center gap-2">
+                <button type="button" title="Table view" aria-label="Table view"
+                    class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-neutral-200 text-neutral-700 transition dark:bg-neutral-800 dark:text-neutral-200"
+                    :class="{ 'ring-2 ring-blue-500': viewMode === 'table' }"
+                    @click="viewMode = 'table'"><flux:icon.table-cells class="size-5" /><span class="sr-only">Table view</span></button>
+                <button type="button" title="Grid view" aria-label="Grid view"
+                    class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-neutral-200 text-neutral-700 transition dark:bg-neutral-800 dark:text-neutral-200"
+                    :class="{ 'ring-2 ring-blue-500': viewMode === 'grid' }"
+                    @click="viewMode = 'grid'"><flux:icon.squares-2x2 class="size-5" /><span class="sr-only">Grid view</span></button>
             </div>
+            @include('livewire.devices._filters')
         </div>
     </div>
 
