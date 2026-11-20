@@ -9,7 +9,7 @@
         </svg>
     </button>
 
-    <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="transform opacity-0 scale-95" x-transition:enter-end="transform opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="transform opacity-100 scale-100" x-transition:leave-end="transform opacity-0 scale-95" class="absolute right-0 z-10 mt-2 w-[calc(100vw-2rem)] max-w-72 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:w-72 dark:bg-neutral-800 dark:ring-neutral-700" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+    <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="transform opacity-0 scale-95" x-transition:enter-end="transform opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="transform opacity-100 scale-100" x-transition:leave-end="transform opacity-0 scale-95" class="absolute right-0 z-10 mt-2 w-[min(20rem,calc(100vw-2rem))] max-h-[75vh] overflow-y-auto origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:w-80 dark:bg-neutral-800 dark:ring-neutral-700" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
         <div class="space-y-3 px-4 py-3" role="none">
             <div>
                 <div class="py-1 text-sm font-semibold text-gray-900 dark:text-white">Filter by Status</div>
@@ -46,7 +46,7 @@
                     <option value="last_month">Last Month</option>
                     <option value="custom">Custom Range</option>
                 </select>
-                <div x-show="dateRange === 'custom'" class="mt-2 grid grid-cols-2 gap-2">
+                <div x-show="dateRange === 'custom'" class="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <label class="text-xs text-gray-500">From
                         <input type="date" x-model="dateFrom" @change="fetchDevices()" class="mt-1 w-full rounded-lg border border-neutral-300 bg-white px-2 py-1 text-sm dark:border-neutral-700 dark:bg-neutral-800">
                     </label>
@@ -57,14 +57,14 @@
             </div>
             <div>
                 <div class="py-1 text-sm font-semibold text-gray-900 dark:text-white">Amount (ETB)</div>
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <input type="number" min="0" step="0.01" placeholder="Min" x-model="amountMin" @change="fetchDevices()" class="w-full rounded-lg border border-neutral-300 bg-white px-2 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-800">
                     <input type="number" min="0" step="0.01" placeholder="Max" x-model="amountMax" @change="fetchDevices()" class="w-full rounded-lg border border-neutral-300 bg-white px-2 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-800">
                 </div>
             </div>
             <div>
                 <div class="py-1 text-sm font-semibold text-gray-900 dark:text-white">Sort By</div>
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <select x-model="sortBy" @change="fetchDevices()" class="w-full rounded-lg border border-neutral-300 bg-white px-2 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-200">
                         <option value="created_at">Newest</option>
                         <option value="amount">Amount</option>

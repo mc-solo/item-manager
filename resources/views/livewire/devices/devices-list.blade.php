@@ -15,6 +15,10 @@
             <span x-show="!isBulkWorking">Apply</span><span x-show="isBulkWorking">Applying...</span>
         </button>
         <button type="button" @click="selected = []" class="shrink-0 rounded-lg border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700">Clear selection</button>
+        <button type="button" x-show="isAdmin" @click="bulkAction = 'delete'; applyBulk()" class="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50" :disabled="isBulkWorking">
+            <flux:icon.trash class="size-4" />
+            Delete selected
+        </button>
     </div>
     <!-- Device Table View -->
     <div class="overflow-x-auto rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900"
