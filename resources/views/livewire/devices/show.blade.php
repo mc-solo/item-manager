@@ -1,7 +1,7 @@
 @component('components.layouts.app')
 @section('title', __('Device Details'))
 
-<div class="max-w-3xl mx-auto p-6">
+<div class="max-w-3xl mx-auto p-4 sm:p-6">
     <h1 class="text-2xl font-bold mb-6 text-neutral-900 dark:text-neutral-100">Device Details</h1>
     @if (session('order_created'))
         <div
@@ -106,20 +106,20 @@
             <p class="text-neutral-500">No progress logs yet.</p>
         @endif
     </div>
-    <div class="flex justify-end mt-6 gap-2">
+    <div class="mt-6 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
         <a href="{{ route('device.print', $device) }}" target="_blank"
-            class="px-4 py-2 bg-neutral-900 text-white rounded-lg shadow hover:bg-neutral-700 font-semibold transition">Print Order</a>
+            class="inline-flex w-full items-center justify-center gap-2 px-4 py-2 bg-neutral-900 text-white rounded-lg shadow hover:bg-neutral-700 font-semibold transition sm:w-auto"><flux:icon.printer class="size-5" />Print Order</a>
         @can('update', $device)
         <a href="{{ route('device.edit', $device) }}"
-            class="px-4 py-2 bg-green-200 text-black hover:bg-green-300 rounded-lg shadow hover:bg-blue-700 font-semibold transition">Edit</a>
+            class="inline-flex w-full items-center justify-center gap-2 px-4 py-2 bg-green-200 text-black hover:bg-green-300 rounded-lg shadow font-semibold transition sm:w-auto"><flux:icon.pencil-square class="size-5" />Edit</a>
         @endcan
         @can('delete', $device)
-        <form method="POST" action="{{ route('device.destroy', $device) }}"
+        <form method="POST" action="{{ route('device.destroy', $device) }}" class="w-full sm:w-auto"
             onsubmit="return confirm('Are you sure you want to delete this device?');">
             @csrf
             @method('DELETE')
             <button type="submit"
-                class="px-4 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 font-semibold transition cursor-pointer">Delete</button>
+                class="inline-flex w-full items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 font-semibold transition cursor-pointer sm:w-auto"><flux:icon.trash class="size-5" />Delete</button>
         </form>
         @endcan
     </div>

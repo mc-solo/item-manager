@@ -45,6 +45,10 @@
     isAdmin: {{ auth()->user()?->isAdmin() ? 'true' : 'false' }},
 
     init() {
+        if (window.innerWidth < 640) {
+            this.viewMode = 'grid';
+        }
+
         this.$el.addEventListener('device-deleted', e => {
             if (e.detail && e.detail.deviceId) {
                 this.devices = this.devices.filter(device => device.id !== e.detail.deviceId);
@@ -160,6 +164,67 @@
             this.showToast('error', error.message || 'Bulk action failed.');
         } finally {
             this.isBulkWorking = false;
+        }
+    },
+
+    async completeDevice(device) {
+        if (!device || device.repair_status === 'completed') {
+            return;
+        }
+        if (!confirm('Are you sure you want to mark this device as completed?')) {
+            return;
+        }
+        try {
+            const response = await fetch(`/devices/${device.id}/complete`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            if (response.status === 403) {
+                throw new Error('You are not allowed to complete this device.');
+            }
+            if (!response.ok) {
+                throw new Error('Unable to mark this device as completed.');
+            }
+            device.repair_status = 'completed';
+            this.showToast('success', `Order ${device.order_number} marked as completed.`);
+        } catch (error) {
+            this.showToast('error', error.message || 'Unable to mark this device as completed.');
+        }
+    },
+
+    async deleteDevice(device) {
+        if (!device || !this.isAdmin) {
+            return;
+        }
+        if (!confirm(`Delete ${device.order_number}? This cannot be undone.`)) {
+            return;
+        }
+        try {
+            const response = await fetch(`/devices/delete/${device.id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            if (response.status === 403) {
+                throw new Error('Only admins can delete devices.');
+            }
+            if (!response.ok) {
+                throw new Error('Unable to delete this device.');
+            }
+            this.devices = this.devices.filter(d => d.id !== device.id);
+            this.selected = this.selected.filter(id => id !== device.id);
+            this.noResults = this.devices.length === 0;
+            this.showToast('success', `Order ${device.order_number} deleted.`);
+        } catch (error) {
+            this.showToast('error', error.message || 'Unable to delete this device.');
         }
     },
 
@@ -433,10 +498,10 @@
         }
     }
 }" x-init="init()" class="flex flex-col gap-6 h-full">
-    <div class="pointer-events-none fixed bottom-4 right-4 z-[70]">
+    <div class="pointer-events-none fixed inset-x-4 bottom-4 z-[70] sm:inset-x-auto sm:right-4 sm:w-full sm:max-w-sm">
         <div x-show="toast.show" x-transition.opacity.duration.200ms x-transition.scale.origin.bottom.right
             style="display: none;"
-            class="pointer-events-auto flex max-w-sm items-start gap-3 rounded-xl border border-neutral-300 bg-white px-4 py-3 text-black shadow-lg dark:border-neutral-300 dark:bg-white dark:text-black">
+            class="pointer-events-auto flex w-full items-start gap-3 rounded-xl border border-neutral-300 bg-white px-4 py-3 text-black shadow-lg dark:border-neutral-300 dark:bg-white dark:text-black">
             <div class="mt-0.5">
                 <span x-show="toast.type === 'success'">✅</span>
                 <span x-show="toast.type !== 'success'">⚠️</span>
@@ -454,36 +519,36 @@
         </div>
     </div>
 
-    <div class="flex flex-wrap items-center justify-between gap-4">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <!-- Left side: Title and Search -->
-        <div class="flex items-center gap-4">
-            <h1 class="text-2xl font-bold">Devices</h1>
+        <div class="flex w-full flex-col gap-3 sm:flex-row sm:items-center lg:w-auto">
+            <h1 class="shrink-0 text-2xl font-bold">Devices</h1>
             @include('livewire.devices.search-bar')
         </div>
 
         <!-- Right side: Actions and Filters -->
-        <div class="flex w-full sm:w-auto items-center justify-between gap-2">
+        <div class="flex w-full flex-wrap items-center gap-2 lg:w-auto lg:justify-end">
             @if($canCreate ?? true)
             <button type="button" @click="openCreateModal()"
-                class="inline-flex items-center justify-center rounded-md border border-transparent bg-neutral-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200 transition">
+                class="inline-flex flex-1 items-center justify-center rounded-md border border-transparent bg-neutral-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition sm:flex-none dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200">
                 Add Order
             </button>
             @endif
             <button type="button" @click="exportFiltered()"
-                class="inline-flex items-center justify-center rounded-md border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 shadow-sm hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 transition">
+                class="inline-flex flex-1 items-center justify-center rounded-md border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 shadow-sm hover:bg-neutral-100 transition sm:flex-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200">
                 Export CSV
             </button>
 
             <div class="flex items-center gap-2">
-                <div class="flex items-center gap-2">
-                    <button
-                        class="rounded-lg px-3 py-2 bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 font-medium transition"
-                        :class="{ 'ring-2 ring-blue-200': viewMode === 'table' }"
-                        @click="viewMode = 'table'">Table</button>
-                    <button
-                        class="rounded-lg px-3 py-2 bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 font-medium transition"
-                        :class="{ 'ring-2 ring-blue-200': viewMode === 'grid' }"
-                        @click="viewMode = 'grid'">Grid</button>
+                <div class="flex shrink-0 items-center gap-2">
+                    <button type="button" title="Table view" aria-label="Table view"
+                        class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-neutral-200 text-neutral-700 transition dark:bg-neutral-800 dark:text-neutral-200"
+                        :class="{ 'ring-2 ring-blue-500': viewMode === 'table' }"
+                        @click="viewMode = 'table'"><flux:icon.table-cells class="size-5" /><span class="sr-only">Table view</span></button>
+                    <button type="button" title="Grid view" aria-label="Grid view"
+                        class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-neutral-200 text-neutral-700 transition dark:bg-neutral-800 dark:text-neutral-200"
+                        :class="{ 'ring-2 ring-blue-500': viewMode === 'grid' }"
+                        @click="viewMode = 'grid'"><flux:icon.squares-2x2 class="size-5" /><span class="sr-only">Grid view</span></button>
                 </div>
                 @include('livewire.devices._filters')
             </div>
@@ -494,7 +559,7 @@
         style="display: none;" @keydown.escape.window="closeCreateModal()">
         <div class="absolute inset-0 bg-black/50" @click="closeCreateModal()"></div>
         <div
-            class="relative z-10 w-full max-w-2xl rounded-xl bg-white p-6 shadow-xl dark:bg-neutral-900 max-h-[90vh] overflow-y-auto">
+            class="relative z-10 w-full max-w-2xl rounded-xl bg-white p-4 shadow-xl sm:p-6 dark:bg-neutral-900 max-h-[90vh] overflow-y-auto">
             <div class="mb-4 flex items-center justify-between">
                 <h2 class="text-xl font-bold text-neutral-900 dark:text-neutral-100">Add Repair Order</h2>
                 <button type="button" @click="closeCreateModal()"
@@ -624,11 +689,11 @@
                     <p class="mt-1 text-xs text-red-600" x-text="createValidationErrors.repair_status?.[0]"></p>
                 </div>
 
-                <div class="md:col-span-2 flex justify-end gap-2 pt-2">
+                <div class="md:col-span-2 flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
                     <button type="button" @click="closeCreateModal()"
-                        class="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800">Cancel</button>
+                        class="w-full rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100 sm:w-auto dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800">Cancel</button>
                     <button type="submit" :disabled="isCreating"
-                        class="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-neutral-700 disabled:opacity-50 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200">
+                        class="w-full rounded-lg bg-neutral-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-neutral-700 disabled:opacity-50 sm:w-auto dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200">
                         <span x-show="!isCreating">Create Order</span>
                         <span x-show="isCreating">Creating...</span>
                     </button>
