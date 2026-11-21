@@ -1,10 +1,8 @@
 <?php
 
-use App\Livewire\Auth\Login;
 use App\Models\Device;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Livewire\Livewire;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
@@ -25,12 +23,10 @@ test('admin can create a technical staff user, staff can log in with username', 
         ->and($staff->role)->toBe('staff')
         ->and(Hash::check('password123', $staff->password))->toBeTrue();
 
-    Livewire::test(Login::class)
-        ->set('login', 'miki')
-        ->set('password', 'password123')
-        ->call('login')
-        ->assertHasNoErrors()
-        ->assertRedirect(route('dashboard', absolute: false));
+    $this->post('/login', [
+        'login' => 'miki',
+        'password' => 'password123',
+    ])->assertRedirect(route('dashboard', absolute: false));
 
     $this->assertAuthenticatedAs($staff);
 });
@@ -38,11 +34,10 @@ test('admin can create a technical staff user, staff can log in with username', 
 test('staff can also log in with email', function () {
     $staff = User::factory()->create(['role' => 'staff', 'username' => 'mesi']);
 
-    Livewire::test(Login::class)
-        ->set('login', $staff->email)
-        ->set('password', 'password')
-        ->call('login')
-        ->assertHasNoErrors();
+    $this->post('/login', [
+        'login' => $staff->email,
+        'password' => 'password',
+    ])->assertRedirect(route('dashboard', absolute: false));
 
     $this->assertAuthenticatedAs($staff);
 });

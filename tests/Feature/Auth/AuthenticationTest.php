@@ -1,8 +1,6 @@
 <?php
 
-use App\Livewire\Auth\Login;
 use App\Models\User;
-use Livewire\Livewire;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
@@ -15,14 +13,12 @@ test('login screen can be rendered', function () {
 test('users can authenticate using the login screen', function () {
     $user = User::factory()->create();
 
-    $response = Livewire::test(Login::class)
-        ->set('login', $user->email)
-        ->set('password', 'password')
-        ->call('login');
+    $response = $this->post('/login', [
+        'login' => $user->email,
+        'password' => 'password',
+    ]);
 
-    $response
-        ->assertHasNoErrors()
-        ->assertRedirect(route('dashboard', absolute: false));
+    $response->assertRedirect(route('dashboard', absolute: false));
 
     $this->assertAuthenticated();
 });
@@ -30,14 +26,12 @@ test('users can authenticate using the login screen', function () {
 test('users can authenticate with their username', function () {
     $user = User::factory()->create(['username' => 'miki']);
 
-    $response = Livewire::test(Login::class)
-        ->set('login', 'miki')
-        ->set('password', 'password')
-        ->call('login');
+    $response = $this->post('/login', [
+        'login' => 'miki',
+        'password' => 'password',
+    ]);
 
-    $response
-        ->assertHasNoErrors()
-        ->assertRedirect(route('dashboard', absolute: false));
+    $response->assertRedirect(route('dashboard', absolute: false));
 
     $this->assertAuthenticated();
 });
@@ -45,12 +39,12 @@ test('users can authenticate with their username', function () {
 test('users can not authenticate with invalid password', function () {
     $user = User::factory()->create();
 
-    $response = Livewire::test(Login::class)
-        ->set('login', $user->email)
-        ->set('password', 'wrong-password')
-        ->call('login');
+    $response = $this->post('/login', [
+        'login' => $user->email,
+        'password' => 'wrong-password',
+    ]);
 
-    $response->assertHasErrors('login');
+    $response->assertSessionHasErrors('login');
 
     $this->assertGuest();
 });
