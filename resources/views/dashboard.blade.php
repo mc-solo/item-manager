@@ -10,8 +10,7 @@
             <!-- Page header -->
             <div class="flex flex-wrap items-end justify-between gap-4">
                 <div>
-                    <x-app-logo />
-                    <p class="mt-2 text-sm text-neutral-500 dark:text-neutral-400">{{ now()->format('l, F j, Y') }} &middot; {{ $totalDevices }} orders in total</p>
+                    <p class="text-sm text-neutral-500 dark:text-neutral-400">{{ now()->format('l, F j, Y') }} &middot; {{ $totalDevices }} orders in total</p>
                 </div>
                 <a href="{{ route('devices.index') }}" class="inline-flex items-center gap-2 rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-neutral-700 focus:outline-none dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200">
                     Go to Devices
