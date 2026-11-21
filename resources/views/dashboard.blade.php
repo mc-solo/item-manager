@@ -5,13 +5,13 @@
         $completedPct = $totalDevices > 0 ? round($completedCount / $totalDevices * 100) : 0;
         $deliveredPct = $totalDevices > 0 ? round($deliveredCount / $totalDevices * 100) : 0;
     @endphp
-    <div class="min-h-screen bg-neutral-50 px-4 py-6 dark:bg-neutral-950 sm:px-6">
+    <div class="min-h-screen bg-neutral-50 px-4 py-6 dark:bg-neutral-900 sm:px-6">
         <div class="mx-auto max-w-7xl space-y-6">
             <!-- Page header -->
             <div class="flex flex-wrap items-end justify-between gap-4">
                 <div>
-                    <p class="text-xs font-semibold uppercase tracking-widest text-neutral-500 dark:text-neutral-400">The Phone Boss</p>
-                    <h1 class="mt-1 text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">Dashboard</h1>
+                    <x-app-logo />
+                    <h1 class="mt-2 text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">Dashboard</h1>
                     <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">{{ now()->format('l, F j, Y') }} &middot; {{ $totalDevices }} orders in total</p>
                 </div>
                 <a href="{{ route('devices.index') }}" class="inline-flex items-center gap-2 rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-neutral-700 focus:outline-none dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200">
