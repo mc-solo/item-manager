@@ -549,7 +549,7 @@
         </div>
     </div>
 
-    <div class="flex flex-wrap items-center gap-3" style="position: relative; z-index: 50;">
+    <div class="flex flex-wrap items-center gap-3" style="position: relative; z-index: 1;">
         <h1 class="shrink-0 text-2xl font-bold leading-none">Devices</h1>
         <div class="min-w-40 flex-1">
             @include('livewire.devices.search-bar')
