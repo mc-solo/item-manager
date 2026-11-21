@@ -91,6 +91,7 @@
                             <flux:icon.chart-bar class="size-5" />
                         </span>
                     </div>
+                    @if ($weekDays->sum('amount') > 0)
                     <div class="mt-6 flex h-56 items-end gap-3 border-b border-neutral-200 dark:border-neutral-800">
                         @foreach ($weekDays as $day)
                             <div class="flex h-full flex-1 flex-col items-center justify-end gap-2">
@@ -106,6 +107,13 @@
                             </div>
                         @endforeach
                     </div>
+                    @else
+                    <div class="mt-6 flex h-56 flex-col items-center justify-center gap-2 rounded-xl bg-neutral-50 text-center dark:bg-neutral-800/50">
+                        <flux:icon.chart-bar class="size-8 text-neutral-400" />
+                        <p class="text-sm font-medium text-neutral-700 dark:text-neutral-200">No completed income in the last 7 days</p>
+                        <p class="text-sm text-neutral-500 dark:text-neutral-400">Mark an order as completed and it will show up here.</p>
+                    </div>
+                    @endif
                 </div>
 
                 <div class="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900">
