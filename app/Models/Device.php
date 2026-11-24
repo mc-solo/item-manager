@@ -24,6 +24,7 @@ class Device extends Model
         'issue_description',
         'repair_status',
         'amount',
+        'assigned_to',
         'created_at',
         'updated_at',
     ];
@@ -31,6 +32,29 @@ class Device extends Model
     public function progressLogs()
     {
         return $this->hasMany(DeviceProgressLogs::class, 'device_id');
+    }
+
+    public function assignedTechnician()
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
+    }
+
+    /**
+     * Scope a query to what the given user may see. Admins see every
+     * order, assigned or not. A technician only sees orders assigned
+     * to them, so an unassigned order is invisible to technicians.
+     */
+    public function scopeForUser($query, $user)
+    {
+        if ($user?->isAdmin()) {
+            return $query;
+        }
+
+        if ($user) {
+            return $query->where('assigned_to', $user->id);
+        }
+
+        return $query->whereRaw('1 = 0');
     }
 
     /**

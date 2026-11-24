@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\Device;
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreDeviceRequest extends FormRequest
@@ -37,7 +38,46 @@ class StoreDeviceRequest extends FormRequest
             'imei' => 'nullable|string|max:100',
             'issue_description' => 'nullable|string|max:500',
             'repair_status' => 'required|in:pending,in_progress,completed,cancelled,delivered',
+            // Assignment: technician type first, then the specific
+            // technician of that type. `assign_role` is a form-only
+            // field, it is not a column on devices, so the controller
+            // unsets it before creating the device.
+            'assign_role' => 'nullable|string|in:' . implode(',', User::TECHNICIAN_ROLES),
+            'assigned_to' => 'nullable|integer|exists:users,id',
         ];
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            $assignedTo = $this->input('assigned_to');
+
+            if ($assignedTo) {
+                $technician = User::find($assignedTo);
+
+                if ($technician && ! $technician->isTechnician()) {
+                    $validator->errors()->add('assigned_to', 'The assigned user must be a technician.');
+                }
+
+                // The assigned user must be of the chosen technician type.
+                if ($technician && $this->has('assign_role') && $this->input('assign_role') && $technician->role !== $this->input('assign_role')) {
+                    $validator->errors()->add('assigned_to', 'The assigned technician must be a ' . User::roleLabel($this->input('assign_role')) . '.');
+                }
+            }
+
+            // Only the create form sends assign_role, so this required
+            // check does not fire on edit, where the form has no
+            // assignment fields. If technicians of the chosen type
+            // exist, one must be chosen; if none exist yet, the order
+            // may be created unassigned.
+            if ($this->has('assign_role') && ! $assignedTo) {
+                $assignRole = $this->input('assign_role', User::ROLE_HARDWARE_TECHNICIAN);
+
+                if ($assignRole && User::where('role', $assignRole)->exists()) {
+                    $validator->errors()->add('assigned_to', 'Please choose a ' . User::roleLabel($assignRole) . '.');
+                }
+            }
+        });
     }
 
     /**
