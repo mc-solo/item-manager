@@ -23,15 +23,15 @@ test('dashboard shows real counts and amounts, not hardcoded numbers', function 
 
 test('dashboard shows the admin users section only to admins', function () {
     $admin = User::factory()->create(['role' => 'admin']);
-    $staff = User::factory()->create(['role' => 'staff']);
+    $staff = User::factory()->create(['role' => 'hardware_technician']);
 
     $this->actingAs($admin)->get('/dashboard')->assertSee('Users (admin only)');
     $this->actingAs($staff)->get('/dashboard')->assertDontSee('Users (admin only)');
 });
 
 test('dashboard shows recorded payments', function () {
-    $user = User::factory()->create(['role' => 'staff']);
-    $device = Device::factory()->create();
+    $user = User::factory()->create(['role' => 'hardware_technician']);
+    $device = Device::factory()->create(['assigned_to' => $user->id]);
     Transaction::create(['device_id' => $device->id, 'type' => 'deposit', 'amount' => 1000]);
 
     $response = $this->actingAs($user)->get('/dashboard');
@@ -42,8 +42,8 @@ test('dashboard shows recorded payments', function () {
 });
 
 test('any logged in user can print an order, guests cannot', function () {
-    $staff = User::factory()->create(['role' => 'staff']);
-    $device = Device::factory()->create(['client_name' => 'Miki Test', 'amount' => 1500]);
+    $staff = User::factory()->create(['role' => 'hardware_technician']);
+    $device = Device::factory()->create(['client_name' => 'Miki Test', 'amount' => 1500, 'assigned_to' => $staff->id]);
 
     $this->get("/devices/print/{$device->id}")->assertRedirect('/login');
 

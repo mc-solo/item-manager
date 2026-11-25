@@ -78,6 +78,10 @@
                 </dd>
             </div>
             <div>
+                <dt class="font-medium text-neutral-700 dark:text-neutral-200">Assigned To</dt>
+                <dd class="text-neutral-900 dark:text-neutral-100">{{ $device->assignedTechnician ? $device->assignedTechnician->name . ' (' . \App\Models\User::roleLabel($device->assignedTechnician->role) . ')' : 'Unassigned' }}</dd>
+            </div>
+            <div>
                 <dt class="font-medium text-neutral-700 dark:text-neutral-200">Received At</dt>
                 <dd class="text-neutral-900 dark:text-neutral-100">{{ $device->created_at->format('Y-m-d H:i') }}</dd>
             </div>

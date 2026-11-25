@@ -12,9 +12,14 @@ class DevicePolicy
         return true;
     }
 
+    /**
+     * Admins see every order. A technician only sees, edits and
+     * completes orders assigned to them. The list itself is also
+     * scoped in the controller, this is the direct-URL guard.
+     */
     public function view(User $user, Device $device): bool
     {
-        return true;
+        return $user->isAdmin() || $device->assigned_to === $user->id;
     }
 
     public function create(User $user): bool
@@ -24,12 +29,12 @@ class DevicePolicy
 
     public function update(User $user, Device $device): bool
     {
-        return true;
+        return $user->isAdmin() || $device->assigned_to === $user->id;
     }
 
     public function complete(User $user, Device $device): bool
     {
-        return true;
+        return $user->isAdmin() || $device->assigned_to === $user->id;
     }
 
     public function export(User $user): bool
@@ -43,7 +48,7 @@ class DevicePolicy
     }
 
     /**
-     * Only admins can delete. Staff get a 403, they do not just lose
+     * Only admins can delete. Technicians get a 403, they do not just lose
      * the button in the UI.
      */
     public function delete(User $user, Device $device): bool

@@ -31,6 +31,7 @@
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Client</th>
                     <th class="hidden px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider sm:table-cell">Device | Model</th>
                     <th class="hidden px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider md:table-cell">Amount</th>
+                    <th class="hidden px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider md:table-cell">Assigned To</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">Status</th>
                     <th class="sticky right-0 bg-neutral-50 px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider dark:bg-neutral-800">Actions</th>
                 </tr>
@@ -38,7 +39,7 @@
             <tbody class="divide-y divide-neutral-200 dark:divide-neutral-800">
                 <template x-if="noResults">
                     <tr>
-                        <td colspan="7" class="text-center py-4 text-neutral-500">No devices found for your search.</td>
+                        <td colspan="8" class="text-center py-4 text-neutral-500">No devices found for your search.</td>
                     </tr>
                 </template>
                 <template x-for="device in devices" :key="device.id">
@@ -56,6 +57,9 @@
                         </td>
                         <td class="hidden px-4 py-3 whitespace-nowrap md:table-cell">
                             <span x-text="Number(device.amount ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ETB'"></span>
+                        </td>
+                        <td class="hidden px-4 py-3 whitespace-nowrap md:table-cell">
+                            <span x-text="device.assigned_technician_name ?? 'Unassigned'"></span>
                         </td>
                         <td class="px-4 py-3 whitespace-nowrap">
                             <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
@@ -138,6 +142,10 @@
                         <div class="text-sm mt-1">
                             <span class="font-medium text-neutral-700 dark:text-neutral-300">Amount:</span>
                             <span class="text-neutral-600 dark:text-neutral-400" x-text="Number(device.amount ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ETB'"></span>
+                        </div>
+                        <div class="text-sm mt-1">
+                            <span class="font-medium text-neutral-700 dark:text-neutral-300">Assigned to:</span>
+                            <span class="text-neutral-600 dark:text-neutral-400" x-text="device.assigned_technician_name ?? 'Unassigned'"></span>
                         </div>
                         <div class="text-xs text-neutral-500 dark:text-neutral-400 mt-1 line-clamp-2" x-text="device.issue_description"></div>
                     </div>

@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Hash;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-test('admin can create a technical staff user, staff can log in with username', function () {
+test('admin can create a technical user, technician can log in with username', function () {
     $admin = User::factory()->create(['role' => 'admin', 'username' => 'boss']);
 
     $this->actingAs($admin)->post('/admin/users', [
@@ -15,12 +15,12 @@ test('admin can create a technical staff user, staff can log in with username', 
         'email' => 'miki@example.com',
         'password' => 'password123',
         'password_confirmation' => 'password123',
-        'role' => 'staff',
+        'role' => 'hardware_technician',
     ])->assertRedirect();
 
     $staff = User::where('username', 'miki')->first();
     expect($staff)->not->toBeNull()
-        ->and($staff->role)->toBe('staff')
+        ->and($staff->role)->toBe('hardware_technician')
         ->and(Hash::check('password123', $staff->password))->toBeTrue();
 
     $this->post('/login', [
@@ -31,8 +31,8 @@ test('admin can create a technical staff user, staff can log in with username', 
     $this->assertAuthenticatedAs($staff);
 });
 
-test('staff can also log in with email', function () {
-    $staff = User::factory()->create(['role' => 'staff', 'username' => 'mesi']);
+test('technician can also log in with email', function () {
+    $staff = User::factory()->create(['role' => 'hardware_technician', 'username' => 'mesi']);
 
     $this->post('/login', [
         'login' => $staff->email,
@@ -42,8 +42,8 @@ test('staff can also log in with email', function () {
     $this->assertAuthenticatedAs($staff);
 });
 
-test('staff cannot open Manage Users or create users, admin can', function () {
-    $staff = User::factory()->create(['role' => 'staff', 'username' => 'miki']);
+test('technician cannot open Manage Users or create users, admin can', function () {
+    $staff = User::factory()->create(['role' => 'hardware_technician', 'username' => 'miki']);
     $admin = User::factory()->create(['role' => 'admin', 'username' => 'boss']);
 
     $this->actingAs($staff)->get('/admin/users')->assertForbidden();
@@ -53,15 +53,15 @@ test('staff cannot open Manage Users or create users, admin can', function () {
         'email' => 'nope@example.com',
         'password' => 'password123',
         'password_confirmation' => 'password123',
-        'role' => 'staff',
+        'role' => 'hardware_technician',
     ])->assertForbidden();
 
     $this->actingAs($admin)->get('/admin/users')->assertOk();
 });
 
-test('admin can reset a staff password and delete a staff user, but not themselves', function () {
+test('admin can reset a technician password and delete a technician user, but not themselves', function () {
     $admin = User::factory()->create(['role' => 'admin', 'username' => 'boss']);
-    $staff = User::factory()->create(['role' => 'staff', 'username' => 'miki']);
+    $staff = User::factory()->create(['role' => 'hardware_technician', 'username' => 'miki']);
 
     $this->actingAs($admin)->put("/admin/users/{$staff->id}/reset-password", [
         'password' => 'newpassword123',
@@ -86,8 +86,8 @@ test('admin cannot delete the last admin', function () {
     expect(User::find($admin->id))->not->toBeNull();
 });
 
-test('staff cannot delete a device from the list, admin can', function () {
-    $staff = User::factory()->create(['role' => 'staff', 'username' => 'miki']);
+test('technician cannot delete a device from the list, admin can', function () {
+    $staff = User::factory()->create(['role' => 'hardware_technician', 'username' => 'miki']);
     $admin = User::factory()->create(['role' => 'admin', 'username' => 'boss']);
     $device = Device::factory()->create();
 
@@ -98,8 +98,8 @@ test('staff cannot delete a device from the list, admin can', function () {
     expect(Device::find($device->id))->toBeNull();
 });
 
-test('admin can bulk delete selected devices, staff cannot', function () {
-    $staff = User::factory()->create(['role' => 'staff', 'username' => 'miki']);
+test('admin can bulk delete selected devices, technician cannot', function () {
+    $staff = User::factory()->create(['role' => 'hardware_technician', 'username' => 'miki']);
     $admin = User::factory()->create(['role' => 'admin', 'username' => 'boss']);
     $devices = Device::factory()->count(2)->create();
 

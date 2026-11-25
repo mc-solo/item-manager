@@ -7,6 +7,7 @@ use App\Http\Requests\BulkDeviceRequest;
 use App\Http\Requests\StoreDeviceRequest;
 use App\Http\Requests\UpdateDeviceRequest;
 use App\Models\Device;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -35,9 +36,10 @@ class DeviceController extends Controller
         ];
     }
 
-    private function filteredQuery(array $filters)
+    private function filteredQuery(array $filters, $user = null)
     {
-        return Device::with('progressLogs')
+        return Device::with(['progressLogs', 'assignedTechnician'])
+            ->forUser($user)
             ->search($filters['search'] ?? null)
             ->status($filters['status'] ?? null)
             ->deviceType($filters['device_type'] ?? null)
@@ -47,19 +49,39 @@ class DeviceController extends Controller
             ->orderBy('id', 'desc');
     }
 
+    /** Technicians grouped by technician type, for the Assign to fields. */
+    private function techniciansByRole(): array
+    {
+        $grouped = [
+            User::ROLE_HARDWARE_TECHNICIAN => [],
+            User::ROLE_SOFTWARE_TECHNICIAN => [],
+        ];
+
+        foreach (User::whereIn('role', User::TECHNICIAN_ROLES)->orderBy('name')->get(['id', 'name', 'username', 'role']) as $technician) {
+            $grouped[$technician->role][] = [
+                'id' => $technician->id,
+                'name' => $technician->name,
+                'username' => $technician->username,
+            ];
+        }
+
+        return $grouped;
+    }
+
     // return a listing of devices for /device route
     public function index(Request $request)
     {
         Gate::authorize('viewAny', Device::class);
 
         $filters = $request->validate($this->filterRules());
-        $devices = $this->filteredQuery($filters)->get();
+        $devices = $this->filteredQuery($filters, $request->user())->get();
 
         // Format the devices data
         $formattedDevices = $devices->map(function (Device $device) {
             return array_merge($device->toArray(), [
                 'created_at' => $device->created_at->toDateTimeString(),
                 'updated_at' => $device->updated_at->toDateTimeString(),
+                'assigned_technician_name' => $device->assignedTechnician?->name,
             ]);
         })->toArray();
 
@@ -71,6 +93,7 @@ class DeviceController extends Controller
             'devices' => $devices,
             'search' => $filters['search'] ?? null,
             'canCreate' => $request->user()?->can('create', Device::class) ?? false,
+            'techniciansByRole' => $this->techniciansByRole(),
         ]);
     }
 
@@ -91,6 +114,8 @@ class DeviceController extends Controller
         } while (Device::where('order_number', $orderNumber)->exists());
 
         $validated = $request->validated();
+        // assign_role is a form-only field, not a device column.
+        unset($validated['assign_role']);
         $validated['order_number'] = $orderNumber;
 
         $device = Device::create($validated);
@@ -113,7 +138,7 @@ class DeviceController extends Controller
         Gate::authorize('view', $device);
 
         // load the progress logs for the device
-        $device->load('progressLogs');
+        $device->load(['progressLogs', 'assignedTechnician']);
 
         return view('livewire.devices.show', compact('device'));
     }
@@ -126,7 +151,7 @@ class DeviceController extends Controller
     {
         Gate::authorize('view', $device);
 
-        $device->load(['progressLogs', 'transaction']);
+        $device->load(['progressLogs', 'transaction', 'assignedTechnician']);
 
         return view('livewire.devices.print', compact('device'));
     }
@@ -142,7 +167,11 @@ class DeviceController extends Controller
     // update the device details
     public function update(UpdateDeviceRequest $request, Device $device)
     {
-        $device->update($request->validated());
+        $validated = $request->validated();
+        // assign_role is a form-only field, not a device column.
+        unset($validated['assign_role']);
+
+        $device->update($validated);
 
         return redirect()->route('device.show', $device);
     }
@@ -166,7 +195,8 @@ class DeviceController extends Controller
         Gate::authorize('viewAny', Device::class);
 
         $query = $request->input('search');
-        $devices = Device::with('progressLogs')
+        $devices = Device::with(['progressLogs', 'assignedTechnician'])
+            ->forUser($request->user())
             ->search($query)
             ->latest('created_at')
             ->latest('id')
@@ -198,12 +228,22 @@ class DeviceController extends Controller
 
     /**
      * Bulk actions on selected devices. Status changes are open to
-     * staff, delete is admin only and enforced here, not just in the UI.
+     * technicians, but only on orders assigned to them; delete is
+     * admin only and enforced here, not just in the UI.
      */
     public function bulk(BulkDeviceRequest $request)
     {
         $ids = $request->validated()['ids'];
         $action = $request->validated()['action'];
+
+        // A technician may only touch their own assigned orders.
+        if (! $request->user()?->isAdmin()) {
+            $owned = Device::whereIn('id', $ids)->where('assigned_to', $request->user()->id)->count();
+
+            if ($owned !== count($ids)) {
+                abort(403, 'You can only change orders assigned to you.');
+            }
+        }
 
         if ($action === 'delete') {
             Gate::authorize('bulkDelete', Device::class);
@@ -231,13 +271,13 @@ class DeviceController extends Controller
         Gate::authorize('export', Device::class);
 
         $filters = $request->validate($this->filterRules());
-        $devices = $this->filteredQuery($filters)->get();
+        $devices = $this->filteredQuery($filters, $request->user())->get();
 
         $filename = 'devices-' . now()->format('Y-m-d') . '.csv';
 
         return response()->streamDownload(function () use ($devices) {
             $out = fopen('php://output', 'w');
-            fputcsv($out, ['Order Number', 'Client Name', 'Client Number', 'Device Type', 'Device Model', 'Serial Number', 'IMEI', 'Issue', 'Repair Status', 'Amount (ETB)', 'Received At']);
+            fputcsv($out, ['Order Number', 'Client Name', 'Client Number', 'Device Type', 'Device Model', 'Serial Number', 'IMEI', 'Issue', 'Repair Status', 'Assigned To', 'Amount (ETB)', 'Received At']);
 
             foreach ($devices as $device) {
                 fputcsv($out, [
@@ -250,6 +290,7 @@ class DeviceController extends Controller
                     $device->imei,
                     $device->issue_description,
                     $device->repair_status,
+                    $device->assignedTechnician?->name,
                     $device->amount,
                     $device->created_at?->toDateTimeString(),
                 ]);

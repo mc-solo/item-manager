@@ -32,7 +32,10 @@
         imei: '',
         issue_description: '',
         repair_status: 'pending',
+        assign_role: 'hardware_technician',
+        assigned_to: null,
     },
+    techniciansByRole: @js($techniciansByRole ?? ['hardware_technician' => [], 'software_technician' => []]),
     search: '{{ request('search', '') }}',
     status: '{{ request('status', '') }}',
     dateRange: '{{ request('date_range', '') }}',
@@ -311,9 +314,28 @@
             imei: '',
             issue_description: '',
             repair_status: 'pending',
+            assign_role: 'hardware_technician',
+            assigned_to: null,
         };
         this.createValidationErrors = {};
         this.createTouched = {};
+    },
+
+    techniciansForSelectedRole() {
+        return this.techniciansByRole[this.createForm.assign_role] || [];
+    },
+
+    assignRoleLabel() {
+        return this.createForm.assign_role === 'software_technician' ? 'Software technician' : 'Hardware technician';
+    },
+
+    onAssignRoleChange() {
+        // The technician list changes with the type, so the old
+        // choice no longer applies.
+        this.createForm.assigned_to = null;
+        this.createTouched.assign_role = true;
+        this.validateCreateField('assign_role');
+        this.validateCreateField('assigned_to');
     },
 
     setFieldError(field, message = null) {
@@ -401,6 +423,21 @@
             if (!requiredStatuses.includes(textValue)) return this.setFieldError(field, 'Please select a valid repair status.');
             return this.setFieldError(field, null);
         }
+
+        if (field === 'assign_role') {
+            if (!['hardware_technician', 'software_technician'].includes(textValue)) return this.setFieldError(field, 'Please select a technician type.');
+            return this.setFieldError(field, null);
+        }
+
+        if (field === 'assigned_to') {
+            // If technicians of the chosen type exist, one must be
+            // chosen. If none exist yet, the order may be created
+            // unassigned and the form shows that message instead.
+            if (this.techniciansForSelectedRole().length > 0 && (value === null || value === '' || value === undefined)) {
+                return this.setFieldError(field, 'Please choose a ' + this.assignRoleLabel() + '.');
+            }
+            return this.setFieldError(field, null);
+        }
     },
 
     validateCreateForm() {
@@ -414,6 +451,8 @@
             'imei',
             'issue_description',
             'repair_status',
+            'assign_role',
+            'assigned_to',
         ];
 
         fields.forEach(field => {
@@ -699,6 +738,41 @@
                     <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Optional. Describe the issue (max 500
                         characters).</p>
                     <p class="mt-1 text-xs text-neutral-900 dark:text-neutral-100" x-text="createValidationErrors.issue_description?.[0]"></p>
+                </div>
+
+                <div>
+                    <label class="mb-1 block font-medium text-neutral-700 dark:text-neutral-200">Assign To (Technician Type)</label>
+                    <select name="assign_role" x-model="createForm.assign_role"
+                        @change="onAssignRoleChange()"
+                        class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 dark:border-neutral-700 dark:bg-neutral-800"
+                        :class="{ 'border-neutral-900 dark:border-neutral-100': createValidationErrors.assign_role }"
+                        required>
+                        <option value="hardware_technician">Hardware technician</option>
+                        <option value="software_technician">Software technician</option>
+                    </select>
+                    <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">The order goes to a technician of this type.</p>
+                    <p class="mt-1 text-xs text-neutral-900 dark:text-neutral-100" x-text="createValidationErrors.assign_role?.[0]"></p>
+                </div>
+
+                <div>
+                    <label class="mb-1 block font-medium text-neutral-700 dark:text-neutral-200">Technician</label>
+                    <template x-if="techniciansForSelectedRole().length > 0">
+                        <select name="assigned_to" x-model.number="createForm.assigned_to"
+                            @change="createTouched.assigned_to = true; validateCreateField('assigned_to')"
+                            class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 dark:border-neutral-700 dark:bg-neutral-800"
+                            :class="{ 'border-neutral-900 dark:border-neutral-100': createValidationErrors.assigned_to }"
+                            required>
+                            <option :value="null" disabled>Select a technician</option>
+                            <template x-for="technician in techniciansForSelectedRole()" :key="technician.id">
+                                <option :value="technician.id" x-text="technician.name + ' (' + technician.username + ')'"></option>
+                            </template>
+                        </select>
+                    </template>
+                    <template x-if="techniciansForSelectedRole().length === 0">
+                        <p class="rounded-lg border border-neutral-300 bg-neutral-100 px-3 py-2 text-sm text-neutral-900 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100">No <span x-text="assignRoleLabel().toLowerCase()"></span> user is created so far. Create one in Manage Users first.</p>
+                    </template>
+                    <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Only the technician this order is assigned to will see it.</p>
+                    <p class="mt-1 text-xs text-neutral-900 dark:text-neutral-100" x-text="createValidationErrors.assigned_to?.[0]"></p>
                 </div>
 
                 <div class="md:col-span-2">

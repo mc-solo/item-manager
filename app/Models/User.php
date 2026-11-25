@@ -20,9 +20,23 @@ class User extends Authenticatable
      */
     public const ROLE_ADMIN = 'admin';
 
-    public const ROLE_STAFF = 'staff';
+    public const ROLE_HARDWARE_TECHNICIAN = 'hardware_technician';
 
-    public const ROLES = [self::ROLE_ADMIN, self::ROLE_STAFF];
+    public const ROLE_SOFTWARE_TECHNICIAN = 'software_technician';
+
+    public const ROLES = [self::ROLE_ADMIN, self::ROLE_HARDWARE_TECHNICIAN, self::ROLE_SOFTWARE_TECHNICIAN];
+
+    public const TECHNICIAN_ROLES = [self::ROLE_HARDWARE_TECHNICIAN, self::ROLE_SOFTWARE_TECHNICIAN];
+
+    public static function roleLabel(string $role): string
+    {
+        return match ($role) {
+            self::ROLE_ADMIN => 'Admin',
+            self::ROLE_HARDWARE_TECHNICIAN => 'Hardware technician',
+            self::ROLE_SOFTWARE_TECHNICIAN => 'Software technician',
+            default => $role,
+        };
+    }
 
     protected $fillable = [
         'name',
@@ -37,9 +51,24 @@ class User extends Authenticatable
         return $this->role === self::ROLE_ADMIN;
     }
 
-    public function isStaff(): bool
+    public function isTechnician(): bool
     {
-        return $this->role === self::ROLE_STAFF;
+        return in_array($this->role, self::TECHNICIAN_ROLES, true);
+    }
+
+    public function isHardwareTechnician(): bool
+    {
+        return $this->role === self::ROLE_HARDWARE_TECHNICIAN;
+    }
+
+    public function isSoftwareTechnician(): bool
+    {
+        return $this->role === self::ROLE_SOFTWARE_TECHNICIAN;
+    }
+
+    public function assignedDevices()
+    {
+        return $this->hasMany(Device::class, 'assigned_to');
     }
 
     public function canManageUsers(): bool

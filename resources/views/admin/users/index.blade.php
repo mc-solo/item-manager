@@ -3,7 +3,7 @@
 
 <div class="mx-auto max-w-4xl p-4 sm:p-6">
     <h1 class="mb-2 text-2xl font-bold text-neutral-900 dark:text-neutral-100">Manage Users</h1>
-    <p class="mb-6 text-sm text-neutral-500">Admins can do everything, including deleting devices. Technical staff can create, edit and complete devices, but cannot delete them, change roles, or open this page. Staff log in with their username or email plus their password.</p>
+    <p class="mb-6 text-sm text-neutral-500">Admins can do everything, including deleting devices. Hardware and software technicians can create, edit and complete the devices assigned to them, but cannot delete them, change roles, or open this page. Technicians log in with their username or email plus their password.</p>
 
     @if (session('success'))
         <div class="mb-4 rounded-lg border border-neutral-300 bg-neutral-100 px-3 py-2 text-sm text-neutral-900 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100">{{ session('success') }}</div>
@@ -13,8 +13,8 @@
     @endif
 
     <div class="mb-8 rounded-xl border border-neutral-200 bg-white p-4 shadow-sm sm:p-6 dark:border-neutral-700 dark:bg-neutral-900">
-        <h2 class="mb-1 text-lg font-semibold text-neutral-900 dark:text-neutral-100">Add technical staff</h2>
-        <p class="mb-4 text-sm text-neutral-500">Create a staff account. Give them the username and password, they log in with those.</p>
+        <h2 class="mb-1 text-lg font-semibold text-neutral-900 dark:text-neutral-100">Add technician</h2>
+        <p class="mb-4 text-sm text-neutral-500">Create a technician account. Give them the username and password, they log in with those.</p>
         <form method="POST" action="{{ route('admin.users.store') }}" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             @csrf
             <div>
@@ -37,7 +37,8 @@
                 <label for="role" class="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-200">Role</label>
                 <select name="role" id="role" required
                     class="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-800">
-                    <option value="staff" @selected(old('role', 'staff') === 'staff')>Technical staff</option>
+                    <option value="hardware_technician" @selected(old('role', 'hardware_technician') === 'hardware_technician')>Hardware technician</option>
+                    <option value="software_technician" @selected(old('role') === 'software_technician')>Software technician</option>
                     <option value="admin" @selected(old('role') === 'admin')>Admin</option>
                 </select>
             </div>
@@ -83,7 +84,8 @@
                                 @method('PUT')
                                 <select name="role" aria-label="Role for {{ $user->name }}" class="rounded-lg border border-neutral-300 bg-white px-2 py-1 text-sm dark:border-neutral-700 dark:bg-neutral-800">
                                     <option value="admin" @selected($user->role === 'admin')>Admin</option>
-                                    <option value="staff" @selected($user->role === 'staff')>Technical staff</option>
+                                    <option value="hardware_technician" @selected($user->role === 'hardware_technician')>Hardware technician</option>
+                                    <option value="software_technician" @selected($user->role === 'software_technician')>Software technician</option>
                                 </select>
                                 <button type="submit" title="Save role" aria-label="Save role for {{ $user->name }}" class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-neutral-700 hover:bg-neutral-100 focus:outline-none dark:text-neutral-200 dark:hover:bg-neutral-800">
                                     <flux:icon.check class="size-5" />
