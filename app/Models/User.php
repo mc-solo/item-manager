@@ -24,7 +24,9 @@ class User extends Authenticatable
 
     public const ROLE_SOFTWARE_TECHNICIAN = 'software_technician';
 
-    public const ROLES = [self::ROLE_ADMIN, self::ROLE_HARDWARE_TECHNICIAN, self::ROLE_SOFTWARE_TECHNICIAN];
+    public const ROLE_RECEPTION = 'reception';
+
+    public const ROLES = [self::ROLE_ADMIN, self::ROLE_HARDWARE_TECHNICIAN, self::ROLE_SOFTWARE_TECHNICIAN, self::ROLE_RECEPTION];
 
     public const TECHNICIAN_ROLES = [self::ROLE_HARDWARE_TECHNICIAN, self::ROLE_SOFTWARE_TECHNICIAN];
 
@@ -34,6 +36,7 @@ class User extends Authenticatable
             self::ROLE_ADMIN => 'Admin',
             self::ROLE_HARDWARE_TECHNICIAN => 'Hardware technician',
             self::ROLE_SOFTWARE_TECHNICIAN => 'Software technician',
+            self::ROLE_RECEPTION => 'Reception',
             default => $role,
         };
     }
@@ -64,6 +67,11 @@ class User extends Authenticatable
     public function isSoftwareTechnician(): bool
     {
         return $this->role === self::ROLE_SOFTWARE_TECHNICIAN;
+    }
+
+    public function isReception(): bool
+    {
+        return $this->role === self::ROLE_RECEPTION;
     }
 
     public function assignedDevices()

@@ -75,6 +75,7 @@ class DashboardController extends Controller
             $data['adminCount'] = User::where('role', User::ROLE_ADMIN)->count();
             $data['hardwareTechnicianCount'] = User::where('role', User::ROLE_HARDWARE_TECHNICIAN)->count();
             $data['softwareTechnicianCount'] = User::where('role', User::ROLE_SOFTWARE_TECHNICIAN)->count();
+            $data['receptionCount'] = User::where('role', User::ROLE_RECEPTION)->count();
         }
 
         return view('dashboard', $data);
