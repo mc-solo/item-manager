@@ -155,7 +155,7 @@
                     </span>
                     <div>
                         <h2 class="text-base font-semibold tracking-tight text-neutral-900 dark:text-white">Users</h2>
-                        <p class="text-sm text-neutral-500 dark:text-neutral-400">{{ $totalUsers ?? 0 }} users &middot; {{ $adminCount ?? 0 }} admin &middot; {{ $hardwareTechnicianCount ?? 0 }} hardware &middot; {{ $softwareTechnicianCount ?? 0 }} software</p>
+                        <p class="text-sm text-neutral-500 dark:text-neutral-400">{{ $totalUsers ?? 0 }} users &middot; {{ $adminCount ?? 0 }} admin &middot; {{ $hardwareTechnicianCount ?? 0 }} hardware &middot; {{ $softwareTechnicianCount ?? 0 }} software &middot; {{ $receptionCount ?? 0 }} reception</p>
                     </div>
                 </div>
                 <a href="{{ route('admin.users.index') }}" class="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium transition hover:bg-neutral-100 focus:outline-none dark:border-neutral-700 dark:hover:bg-neutral-800">Manage users</a>

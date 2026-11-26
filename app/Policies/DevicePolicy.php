@@ -13,13 +13,15 @@ class DevicePolicy
     }
 
     /**
-     * Admins see every order. A technician only sees, edits and
-     * completes orders assigned to them. The list itself is also
-     * scoped in the controller, this is the direct-URL guard.
+     * Admins and reception see every order. A technician only sees,
+     * edits and completes orders assigned to them. The list itself
+     * is also scoped in the controller, this is the direct-URL guard.
+     * Reception can view, but not update or complete, which the
+     * update and complete methods below already deny them.
      */
     public function view(User $user, Device $device): bool
     {
-        return $user->isAdmin() || $device->assigned_to === $user->id;
+        return $user->isAdmin() || $user->isReception() || $device->assigned_to === $user->id;
     }
 
     public function create(User $user): bool
@@ -44,7 +46,7 @@ class DevicePolicy
 
     public function bulkUpdate(User $user): bool
     {
-        return true;
+        return $user->isAdmin() || $user->isTechnician();
     }
 
     /**

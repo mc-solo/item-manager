@@ -228,8 +228,9 @@ class DeviceController extends Controller
 
     /**
      * Bulk actions on selected devices. Status changes are open to
-     * technicians, but only on orders assigned to them; delete is
-     * admin only and enforced here, not just in the UI.
+     * technicians, but only on orders assigned to them; reception
+     * cannot bulk change anything; delete is admin only and
+     * enforced here, not just in the UI.
      */
     public function bulk(BulkDeviceRequest $request)
     {

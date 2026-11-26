@@ -40,13 +40,14 @@ class Device extends Model
     }
 
     /**
-     * Scope a query to what the given user may see. Admins see every
-     * order, assigned or not. A technician only sees orders assigned
-     * to them, so an unassigned order is invisible to technicians.
+     * Scope a query to what the given user may see. Admins and
+     * reception see every order, assigned or not. A technician only
+     * sees orders assigned to them, so an unassigned order is
+     * invisible to technicians.
      */
     public function scopeForUser($query, $user)
     {
-        if ($user?->isAdmin()) {
+        if ($user?->isAdmin() || $user?->isReception()) {
             return $query;
         }
 
