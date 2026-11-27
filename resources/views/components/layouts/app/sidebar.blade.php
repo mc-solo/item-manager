@@ -38,12 +38,6 @@
 
         <flux:spacer />
 
-        <flux:navlist variant="outline">
-            <flux:navlist.item icon="folder-git-2" href="https://github.com/mc-solo/item-manager" target="_blank">
-                {{ __('Repo | Docs') }}
-            </flux:navlist.item>
-        </flux:navlist>
-
         <!-- Desktop User Menu -->
         <flux:dropdown class="hidden lg:block" position="bottom" align="start">
             <flux:profile :name="auth()->user()->name" :initials="auth()->user()->initials()"
