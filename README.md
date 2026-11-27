@@ -18,6 +18,19 @@ This is your personal item management system, built to help you keep track of al
 **Dashboard** - Real numbers only: orders by status, income from completed repairs, today and this week, payments recorded, completed income for the last 7 days, amount by device type, oldest open orders, and recent orders. Admins also see user counts with a link to manage users.
 **Print Order** - From an order page or the device list, print a clean receipt for the customer with order number, client, device, issue and amount to pay, plus signature lines.
 
+## API (v1)
+
+The shop also has a REST API for the Flutter mobile app, same backend, same
+database, same rules as the web. Every endpoint lives under `/api/v1`
+(Sanctum token auth, log in with username or email plus password).
+
+- Human guide: [`docs/API.md`](docs/API.md)
+- Swagger / OpenAPI 3.0: [`docs/API_V1_OPENAPI.yaml`](docs/API_V1_OPENAPI.yaml)
+- Postman collection: [`docs/API_V1_POSTMAN.json`](docs/API_V1_POSTMAN.json)
+- System overview: [`ARCHITECTURE.md`](ARCHITECTURE.md)
+
+Run the API tests with `php artisan test --filter=ApiTest`.
+
 ## What's Coming Next
 
 I'm excited to share some of the exciting features I'm working on:

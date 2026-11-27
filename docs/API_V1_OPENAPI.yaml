@@ -1,0 +1,814 @@
+openapi: 3.0.3
+info:
+  title: Item Manager API
+  version: 1.0.0
+  description: |
+    REST API v1 for the Item Manager shop app (device repairs, order
+    numbers TPB-xxxxx). Backend for the Flutter mobile front end. The API
+    shares the Laravel backend, database and rules with the web app.
+    Auth is Sanctum bearer tokens. See docs/API.md for the human guide.
+servers:
+  - url: https://item-manager.thephoneboss.net
+    description: Production
+tags:
+  - name: Auth
+    description: Login, logout and the signed-in user
+  - name: Devices
+    description: Repair orders
+  - name: Dashboard
+    description: Counts and amounts for the signed-in user
+  - name: Technicians
+    description: Technicians for the assign picker
+paths:
+  /api/v1/login:
+    post:
+      tags: [Auth]
+      summary: Log in and get a Sanctum token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [login, password]
+              properties:
+                login:
+                  type: string
+                  description: Username or email, picked by whether it contains '@'.
+                  example: miki
+                password:
+                  type: string
+                  example: secret
+      responses:
+        '200':
+          description: Logged in.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [user, token]
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                  token:
+                    type: string
+                    description: Sanctum plain-text token, send as Bearer on every other call.
+                    example: 1|AbCdEfGhIjKlMnOpQrStUvWxYz
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          description: Too many login attempts (5 per login + IP).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Too many login attempts. Please try again in 60 seconds.
+                  retry_after:
+                    type: integer
+                    example: 60
+  /api/v1/logout:
+    post:
+      tags: [Auth]
+      summary: Revoke the current token
+      responses:
+        '200':
+          description: Logged out.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Logged out.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /api/v1/user:
+    get:
+      tags: [Auth]
+      summary: The signed-in user
+      responses:
+        '200':
+          description: The signed-in user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /api/v1/dashboard:
+    get:
+      tags: [Dashboard]
+      summary: Counts and amounts for the signed-in user
+      description: |
+        Every number comes from the devices and transactions tables. A
+        technician only sees their own assigned orders. The user counts
+        are admin only.
+      responses:
+        '200':
+          description: Dashboard data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dashboard'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /api/v1/technicians:
+    get:
+      tags: [Technicians]
+      summary: Technicians for the assign picker
+      responses:
+        '200':
+          description: Flat list of technicians ordered by name.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Technician'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /api/v1/devices:
+    get:
+      tags: [Devices]
+      summary: List orders, paginated, with search and filters
+      description: |
+        A technician only sees orders assigned to them; admin and
+        reception see all orders.
+      parameters:
+        - name: search
+          in: query
+          schema: { type: string }
+          description: Text search across client name, client number, order number, device model, serial number, IMEI and issue.
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/RepairStatus' }
+        - name: device_type
+          in: query
+          schema: { $ref: '#/components/schemas/DeviceType' }
+        - name: date_range
+          in: query
+          schema:
+            type: string
+            enum: [today, yesterday, this_week, last_week, this_month, last_month, custom]
+        - name: date_from
+          in: query
+          schema: { type: string, format: date }
+          description: Required when date_range is custom (inclusive, Y-m-d).
+        - name: date_to
+          in: query
+          schema: { type: string, format: date }
+          description: Required when date_range is custom (inclusive, Y-m-d).
+        - name: amount_min
+          in: query
+          schema: { type: number, minimum: 0 }
+        - name: amount_max
+          in: query
+          schema: { type: number, minimum: 0 }
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            enum: [created_at, amount, client_name, order_number]
+            default: created_at
+        - name: sort_dir
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+        - name: per_page
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+      responses:
+        '200':
+          description: Paginated list of orders.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DevicePage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    post:
+      tags: [Devices]
+      summary: Create an order
+      description: |
+        Any authenticated user can create an order, exactly like the
+        web. The order_number (TPB-xxxxx) is generated by the server.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceCreate'
+      responses:
+        '201':
+          description: Order created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /api/v1/devices/{device}:
+    parameters:
+      - name: device
+        in: path
+        required: true
+        schema: { type: integer }
+        description: Device id.
+    get:
+      tags: [Devices]
+      summary: One order with progress logs and transactions
+      responses:
+        '200':
+          description: The order.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Devices]
+      summary: Full update of an order
+      description: |
+        Admin, or a technician on their own assigned order. Reception
+        gets 403. All required fields must be sent.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceUpdate'
+      responses:
+        '200':
+          description: Order updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags: [Devices]
+      summary: Delete an order
+      description: Admin only.
+      responses:
+        '200':
+          description: Order deleted.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Device deleted successfully.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /api/v1/devices/{device}/status:
+    parameters:
+      - name: device
+        in: path
+        required: true
+        schema: { type: integer }
+    patch:
+      tags: [Devices]
+      summary: Change only the repair status
+      description: Admin, or a technician on their own assigned order. Reception gets 403.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceStatusUpdate'
+      responses:
+        '200':
+          description: Status updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /api/v1/devices/{device}/assign:
+    parameters:
+      - name: device
+        in: path
+        required: true
+        schema: { type: integer }
+    post:
+      tags: [Devices]
+      summary: Assign an order to a technician
+      description: Admin or reception only.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignRequest'
+      responses:
+        '200':
+          description: Order assigned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+  /api/v1/devices/{device}/complete:
+    parameters:
+      - name: device
+        in: path
+        required: true
+        schema: { type: integer }
+    post:
+      tags: [Devices]
+      summary: Mark an order completed
+      description: |
+        Admin, or a technician on their own assigned order. Reception
+        gets 403. Only the repair_status changes to completed.
+      responses:
+        '200':
+          description: Order completed.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [message, data]
+                properties:
+                  message:
+                    type: string
+                    example: Device marked as completed successfully.
+                  data:
+                    $ref: '#/components/schemas/Device'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Sanctum token
+      description: Sanctum plain-text token from POST /api/v1/login.
+  responses:
+    Unauthorized:
+      description: No token, bad token, or wrong password.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Signed in, but the role or assignment does not allow it.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Order or user not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    ValidationError:
+      description: Validation failed. Field errors are listed under errors.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [message, errors]
+            properties:
+              message:
+                type: string
+                example: The phone number must be a valid Ethiopian mobile number starting with 09 or 07 and 10 digits long.
+              errors:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+  schemas:
+    RepairStatus:
+      type: string
+      enum: [pending, in_progress, completed, cancelled, delivered]
+    DeviceType:
+      type: string
+      enum: [mobile, laptop, tablet, pc, mac, other]
+    UserRole:
+      type: string
+      enum: [admin, hardware_technician, software_technician, reception]
+    TechnicianRole:
+      type: string
+      enum: [hardware_technician, software_technician]
+    User:
+      type: object
+      required: [id, name, username, email, role]
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Miki
+        username:
+          type: string
+          example: miki
+        email:
+          type: string
+          format: email
+          example: miki@example.com
+        role:
+          $ref: '#/components/schemas/UserRole'
+    Technician:
+      type: object
+      required: [id, name, username, role]
+      properties:
+        id:
+          type: integer
+          example: 3
+        name:
+          type: string
+          example: Abebe
+        username:
+          type: string
+          example: abebe
+        role:
+          $ref: '#/components/schemas/TechnicianRole'
+    ProgressLog:
+      type: object
+      properties:
+        id:
+          type: integer
+        progress_description:
+          type: string
+          nullable: true
+        status:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          nullable: true
+        updated_at:
+          type: string
+          nullable: true
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          example: cash
+        amount:
+          type: number
+          example: 1000
+        created_at:
+          type: string
+          nullable: true
+        updated_at:
+          type: string
+          nullable: true
+    Device:
+      type: object
+      required: [id, order_number, client_name, client_number, device_type, device_model, repair_status, amount]
+      properties:
+        id:
+          type: integer
+          example: 12
+        order_number:
+          type: string
+          description: Generated by the server, TPB- + 5 digits.
+          example: TPB-48392
+        client_name:
+          type: string
+          example: Miki
+        client_number:
+          type: string
+          description: Ethiopian mobile, starts 09 or 07, exactly 10 digits.
+          example: '0912345678'
+        device_type:
+          $ref: '#/components/schemas/DeviceType'
+        device_model:
+          type: string
+          example: iPhone 13
+        serial_number:
+          type: string
+          nullable: true
+          example: SN-12345678
+        imei:
+          type: string
+          nullable: true
+          example: '356789012345678'
+        issue_description:
+          type: string
+          nullable: true
+          example: Screen cracked
+        repair_status:
+          $ref: '#/components/schemas/RepairStatus'
+        amount:
+          type: number
+          example: 1000
+        assigned_to:
+          type: integer
+          nullable: true
+          description: User id of the assigned technician.
+          example: 3
+        assigned_technician:
+          allOf:
+            - $ref: '#/components/schemas/Technician'
+          nullable: true
+        progress_logs:
+          type: array
+          description: Only on the single-order response.
+          items:
+            $ref: '#/components/schemas/ProgressLog'
+        transactions:
+          type: array
+          description: Only on the single-order response.
+          items:
+            $ref: '#/components/schemas/Transaction'
+        created_at:
+          type: string
+          example: '2026-11-27 05:10:00'
+        updated_at:
+          type: string
+          example: '2026-11-27 05:10:00'
+    DeviceEnvelope:
+      type: object
+      description: Single-order responses wrap the order in data (Laravel resource).
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/Device'
+    DevicePage:
+      type: object
+      description: Laravel paginated list.
+      required: [data, meta]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Device'
+        links:
+          type: object
+          properties:
+            first:
+              type: string
+              nullable: true
+            last:
+              type: string
+              nullable: true
+            prev:
+              type: string
+              nullable: true
+            next:
+              type: string
+              nullable: true
+        meta:
+          type: object
+          properties:
+            current_page:
+              type: integer
+            per_page:
+              type: integer
+            total:
+              type: integer
+    DeviceCreate:
+      type: object
+      required: [client_name, client_number, amount, device_type, device_model, repair_status]
+      properties:
+        client_name:
+          type: string
+          maxLength: 255
+          example: Miki
+        client_number:
+          type: string
+          pattern: ^0[79][0-9]{8}$
+          description: Ethiopian mobile, starts 09 or 07, exactly 10 digits.
+          example: '0912345678'
+        amount:
+          type: number
+          minimum: 0
+          maximum: 999999.99
+          example: 1000
+        device_type:
+          $ref: '#/components/schemas/DeviceType'
+        device_model:
+          type: string
+          maxLength: 255
+          example: iPhone 13
+        serial_number:
+          type: string
+          maxLength: 100
+          example: SN-12345678
+        imei:
+          type: string
+          maxLength: 100
+          example: '356789012345678'
+        issue_description:
+          type: string
+          maxLength: 500
+          example: Screen cracked
+        repair_status:
+          $ref: '#/components/schemas/RepairStatus'
+        assign_role:
+          $ref: '#/components/schemas/TechnicianRole'
+          description: Form-only field, not stored. If technicians of this type exist, one must be chosen.
+        assigned_to:
+          type: integer
+          description: Must be an existing user who is a technician.
+          example: 3
+    DeviceUpdate:
+      type: object
+      description: Full update, same validation as create.
+      required: [client_name, client_number, amount, device_type, device_model, repair_status]
+      properties:
+        client_name:
+          type: string
+          maxLength: 255
+        client_number:
+          type: string
+          pattern: ^0[79][0-9]{8}$
+        amount:
+          type: number
+          minimum: 0
+          maximum: 999999.99
+        device_type:
+          $ref: '#/components/schemas/DeviceType'
+        device_model:
+          type: string
+          maxLength: 255
+        serial_number:
+          type: string
+          maxLength: 100
+        imei:
+          type: string
+          maxLength: 100
+        issue_description:
+          type: string
+          maxLength: 500
+        repair_status:
+          $ref: '#/components/schemas/RepairStatus'
+        assign_role:
+          $ref: '#/components/schemas/TechnicianRole'
+        assigned_to:
+          type: integer
+    DeviceStatusUpdate:
+      type: object
+      required: [repair_status]
+      properties:
+        repair_status:
+          $ref: '#/components/schemas/RepairStatus'
+    AssignRequest:
+      type: object
+      required: [assigned_to]
+      properties:
+        assigned_to:
+          type: integer
+          description: Must be an existing user who is a technician.
+          example: 3
+        assign_role:
+          $ref: '#/components/schemas/TechnicianRole'
+          description: If given, it must match the technician's role.
+    Dashboard:
+      type: object
+      properties:
+        totalDevices:
+          type: integer
+        statusCounts:
+          type: object
+          additionalProperties:
+            type: integer
+          example: {pending: 10, in_progress: 5, completed: 20}
+        pendingCount:
+          type: integer
+        inProgressCount:
+          type: integer
+        completedCount:
+          type: integer
+        deliveredCount:
+          type: integer
+        cancelledCount:
+          type: integer
+        totalCompletedAmount:
+          type: number
+        totalAmount:
+          type: number
+        todayReceived:
+          type: integer
+        todayCompleted:
+          type: integer
+        todayCompletedAmount:
+          type: number
+        receivedThisWeek:
+          type: integer
+        completedThisMonthAmount:
+          type: number
+        transactionCount:
+          type: integer
+        transactionTotal:
+          type: number
+        depositTotal:
+          type: number
+        cashTotal:
+          type: number
+        weekDays:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+                example: Fri
+              amount:
+                type: number
+        weekMax:
+          type: number
+        amountByType:
+          type: array
+          items:
+            type: object
+            properties:
+              device_type:
+                type: string
+              total:
+                type: integer
+              amount:
+                type: number
+        recentDevices:
+          type: array
+          items:
+            $ref: '#/components/schemas/Device'
+        needsAttention:
+          type: array
+          items:
+            $ref: '#/components/schemas/Device'
+        totalUsers:
+          type: integer
+          description: Admin only.
+        adminCount:
+          type: integer
+          description: Admin only.
+        hardwareTechnicianCount:
+          type: integer
+          description: Admin only.
+        softwareTechnicianCount:
+          type: integer
+          description: Admin only.
+        receptionCount:
+          type: integer
+          description: Admin only.
+    Error:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+          example: Unauthenticated.
+security:
+  - bearerAuth: []
