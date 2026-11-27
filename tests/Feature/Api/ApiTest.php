@@ -183,6 +183,6 @@ test('dashboard returns counts for the signed in user', function () {
         ->assertJsonPath('totalDevices', 2)
         ->assertJsonPath('pendingCount', 1)
         ->assertJsonPath('completedCount', 1)
-        ->assertJsonPath('totalCompletedAmount', 500.0)
+        ->assertJsonPath('totalCompletedAmount', 500)
         ->assertJsonStructure(['statusCounts', 'weekDays', 'amountByType', 'recentDevices', 'needsAttention', 'totalUsers']);
 });
